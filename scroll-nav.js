@@ -16,7 +16,7 @@
         const sectionTop = section.offsetTop;
         const sectionHeight = section.offsetHeight;
 
-        if (pageYOffset >= sectionTop - sectionHeight / 3) {
+        if (pageYOffset >= sectionTop - sectionHeight / 1.5) {
             currentSection = section.getAttribute("id");
         }
         });
