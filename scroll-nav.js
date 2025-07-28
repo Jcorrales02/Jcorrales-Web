@@ -28,3 +28,45 @@
         }
         });
     });
+
+
+
+
+const botonesAbrir = document.querySelectorAll('.ver-diploma-btn');
+const botonesCerrar = document.querySelectorAll('.cerrar-modal');
+
+botonesAbrir.forEach(boton => {
+    boton.addEventListener('click', function(e) {
+    e.preventDefault();
+    const idModal = this.getAttribute('data-modal');
+    const modal = document.getElementById(idModal);
+
+    modal.classList.add('activo');
+    setTimeout(() => {
+        modal.style.display = 'flex';
+    }, 0);
+
+    document.body.classList.add('body-sin-scroll');
+    });
+});
+
+botonesCerrar.forEach(cerrar => {
+    cerrar.addEventListener('click', function() {
+    const modal = this.closest('.modal');
+    modal.classList.remove('activo');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+    document.body.classList.remove('body-sin-scroll');
+    });
+});
+
+window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+    e.target.classList.remove('activo');
+    setTimeout(() => {
+        e.target.style.display = 'none';
+    }, 300);
+    document.body.classList.remove('body-sin-scroll');
+    }
+});

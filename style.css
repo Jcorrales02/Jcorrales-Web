@@ -18,7 +18,7 @@
 
 /* Tamaños de texto mobile */
     --texto-nombre: 2.5em;
-    --texto-base: 16px;
+    --texto-base: 15px;
     --texto-pequeño: 14px;
     --titulo-seccion: 28px;
     --titulo-sidebar: 32px;
@@ -228,29 +228,93 @@ h2 {
 }
 
 /*CONTENIDO EDUCACION*/
+.education-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.education-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.imagen-miniatura {
+    width: 80%;
+    max-width: 250px;
+    height: auto;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.imagen-miniatura:hover {
+    transform: scale(1.03);
+}
+
+.education-content {
+    text-align: left;
+}
+
+.education-fecha {
+    font-size: 0.75rem;        
+    color: var(--color-secundario);
+    text-align: center;
+    font-style: italic;
+}
+
 #education {
     margin-bottom: 80px;
 }
 
 .education-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 40px;
+
 }
 
 .education-item h3 {
     font-size: 1.1rem;
     color: var(--color-texto-2);
+    margin: 0;
 }
+
 
 .education-institution {
-    display: block;
-    font-size: 0.9rem;
+    font-size: .95rem;
     color: var(--color-secundario);
-    margin: 4px 0 10px;
+    font-weight: 500;
+    margin: 0;
 }
 
+.education-item a.ver-diploma-btn {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--color-acento);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.education-item a.ver-diploma-btn:hover {
+    color: var(--color-texto-2);
+}
+
+
 .education-item p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--color-texto);
+}
+
+.education-content span{
+    font-style: italic; 
 }
 
 
@@ -295,6 +359,7 @@ text-decoration: underline;
     transition: color 0.3s ease;
 }
 
+
 #contact a:hover {
     color: white;
 }
@@ -305,6 +370,71 @@ footer {
     padding: 40px 0;
     color: var(--color-secundario);
     font-size: var(--texto-pequeño);
+}
+
+/* MODAL GENERAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+
+
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+
+
+    backdrop-filter: blur(5px); /* 🎯 Aplica el desenfoque */
+    -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+}
+
+.modal.activo {
+    display: flex;
+    opacity: 1;
+    transform: scale(1);
+}
+
+
+/* CONTENIDO DEL MODAL */
+.modal-contenido {
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 100%;
+    max-height: 90%;
+    overflow: auto;
+    position: relative;
+    text-align: center;
+}
+
+/* BOTÓN CERRAR */
+.cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #000;
+    cursor: pointer;
+}
+
+/* IMAGEN DEL DIPLOMA */
+.imagen-diploma {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    border-radius: 4px;
+    object-fit: contain;
+    max-height: 80vh;
+    margin: 0 auto;
 }
 
 /*PANTALLA 720P*/
@@ -319,14 +449,15 @@ footer {
         border-radius: 5px;
         background-color: transparent;
         transition: box-shadow 0.4s ease, background-color 0.4s ease;
+        border: 1px solid transparent;
     }
 
     .card-hover:hover {
         background-color: var(--color-fondo);
-
         box-shadow:
             4px 8px 20px rgba(0, 0, 0, 0.2),
             8px 12px 30px rgba(0, 0, 0, 0.25);
+        border: 1.5px solid rgba(51, 51, 51, 0.15);
     }
 
     .card-hover:hover h3{
@@ -339,7 +470,7 @@ footer {
         margin: 0 auto;
         padding: 0 10px;
         align-items: flex-start;
-        gap:  clamp(100px, 50vw, 180px);
+        gap:  clamp(40px, 5vw, 160px);
     }
 
     .sidebar {
@@ -432,10 +563,15 @@ footer {
     }
 
     .content {
-        width: 60%;
+        width: 65%;
         margin-left: 0;
     }
 
+    .section-title p{
+        text-align: justify;
+        text-align-last: left;
+    }
+    
 
     .description {
         font-size: var(--texto-description);
@@ -471,6 +607,39 @@ footer {
     #education{
         margin-bottom: 150px;
     }
+
+    .education-layout {
+        flex-direction: row;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .imagen-miniatura {
+        align-self: center; 
+        margin: 0 auto;
+        display: block;
+        width: 130px;
+    }
+
+    .education-visual {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .education-content {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;          
+        line-height: 1.6; 
+    }
+
+    .education-fecha {
+        text-align: center;
+    }
+
 
     #education .education-item {
         padding: 25px;
