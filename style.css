@@ -313,8 +313,13 @@ h2 {
     color: var(--color-texto);
 }
 
-.education-content span{
+.education-content a{
     font-style: italic; 
+}
+
+.education-content a:hover{
+    color: var(--color-texto-2);
+    text-decoration: underline;
 }
 
 
