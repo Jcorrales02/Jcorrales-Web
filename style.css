@@ -196,7 +196,7 @@ section h2::before {
 }
 
 section {
-    margin-bottom: 80px;
+    margin-bottom: 10px;
 }
 
 h2 {
@@ -446,7 +446,7 @@ footer {
 
 @media (min-width: 720px) {
     .section-title {
-        display: none;
+        display: block;
     }
 
     .card-hover {
@@ -506,7 +506,7 @@ footer {
     }
 
     #about {
-        margin-top: 80px;
+        margin-top: 27px;
         margin-bottom: 150px;
     }
 
@@ -653,6 +653,12 @@ footer {
 
     #projects{
         margin-bottom: 150px;
+    }
+
+    .project-links a{
+        font-size: var(--texto-nav-items);
+        color: var(--color-acento);
+        padding: 15px;
     }
 
     .project-item {
