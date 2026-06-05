@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab · SOAR Automation con n8n — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .lab-page { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+
+        .back-link { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); opacity: 0.6; margin-bottom: 40px; transition: all var(--transition); text-decoration: none; }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+
+        .lab-header { margin-bottom: 40px; }
+        .lab-meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+        .lab-type { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); opacity: 0.7; letter-spacing: 0.1em; }
+        .lab-badge { font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+        .badge-soar { background: rgba(0,212,170,0.1); color: var(--accent); border: 1px solid var(--tag-border); }
+        .badge-ai { background: rgba(138,43,226,0.1); color: #b57bee; border: 1px solid rgba(138,43,226,0.2); }
+        .badge-homelab { background: rgba(0,140,255,0.1); color: #4db8ff; border: 1px solid rgba(0,140,255,0.2); }
+
+        .lab-header h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: var(--text-bright); letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 12px; }
+        .lab-header p.lead { font-size: 0.95rem; color: var(--text); line-height: 1.75; max-width: 680px; }
+
+        .info-bar { display: flex; flex-wrap: wrap; gap: 24px; padding: 18px 20px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 48px; }
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+        .info-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.08em; }
+        .info-value { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-2); }
+
+        .lab-section { margin-bottom: 48px; }
+        .lab-section-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .lab-section h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .lab-section p { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 14px; }
+        .lab-section ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .lab-section ul li { font-size: 0.9rem; color: var(--text); padding-left: 18px; position: relative; line-height: 1.7; }
+        .lab-section ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); opacity: 0.5; font-family: var(--font-mono); font-size: 0.75rem; }
+
+        /* Stack grid */
+        .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin: 20px 0; }
+        .stack-item { padding: 14px 16px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; gap: 6px; transition: all var(--transition); }
+        .stack-item:hover { border-color: var(--border-light); background: var(--bg-hover); }
+        .stack-icon { font-size: 1.2rem; }
+        .stack-name { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-2); }
+        .stack-role { font-size: 0.75rem; color: var(--text); opacity: 0.6; }
+
+        /* Flow diagram */
+        .flow-diagram { background: #050b12; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin: 20px 0; font-family: var(--font-mono); font-size: 0.78rem; overflow-x: auto; }
+        .flow-node { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+        .flow-arrow { color: var(--accent); opacity: 0.3; padding-left: 16px; }
+        .flow-box { padding: 4px 12px; border-radius: 4px; font-size: 0.76rem; }
+        .flow-trigger { background: rgba(0,212,170,0.08); color: var(--accent); border: 1px solid var(--tag-border); }
+        .flow-ai { background: rgba(138,43,226,0.08); color: #b57bee; border: 1px solid rgba(138,43,226,0.2); }
+        .flow-code { background: rgba(0,140,255,0.08); color: #4db8ff; border: 1px solid rgba(0,140,255,0.2); }
+        .flow-api { background: rgba(240,165,0,0.08); color: var(--warn); border: 1px solid var(--warn-dim); }
+        .flow-output { background: rgba(0,212,170,0.12); color: var(--accent); border: 1px solid var(--tag-border); }
+        .flow-dim { color: var(--text); opacity: 0.35; font-size: 0.7rem; }
+
+        /* Screenshot placeholder */
+        .screenshot-block { margin: 24px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+        .screenshot-block img { width: 100%; display: block; }
+        .screenshot-placeholder { padding: 40px 20px; background: var(--bg-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 180px; }
+        .screenshot-placeholder i { font-size: 1.8rem; color: var(--accent); opacity: 0.25; }
+        .screenshot-placeholder span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text); opacity: 0.4; }
+        .screenshot-caption { padding: 10px 16px; background: var(--bg-2); border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); opacity: 0.6; }
+
+        /* Component steps */
+        .components { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+        .component { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all var(--transition); }
+        .component:hover { border-color: var(--border-light); }
+        .component-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+        .component-num { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); opacity: 0.5; min-width: 28px; }
+        .component-name { font-size: 0.92rem; font-weight: 600; color: var(--text-bright); flex: 1; }
+        .component-type { font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; }
+        .type-slack { background: rgba(74,21,75,0.3); color: #e879f9; border: 1px solid rgba(232,121,249,0.2); }
+        .type-ai { background: rgba(138,43,226,0.1); color: #b57bee; border: 1px solid rgba(138,43,226,0.2); }
+        .type-code { background: rgba(0,140,255,0.1); color: #4db8ff; border: 1px solid rgba(0,140,255,0.2); }
+        .type-api { background: rgba(240,165,0,0.1); color: var(--warn); border: 1px solid var(--warn-dim); }
+        .component-body { padding: 16px 18px; }
+        .component-body p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 10px; }
+        .component-body p:last-child { margin-bottom: 0; }
+
+        /* Code block */
+        .code-block { background: #050b12; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; margin: 12px 0; font-family: var(--font-mono); font-size: 0.76rem; color: var(--accent); overflow-x: auto; line-height: 1.9; }
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+        .code-block .str { color: #ffa500; }
+        .code-block .key { color: #4db8ff; }
+        .code-block .val { color: var(--text-2); }
+
+        /* Prompt block */
+        .prompt-block { background: rgba(138,43,226,0.04); border: 1px solid rgba(138,43,226,0.15); border-radius: var(--radius); padding: 16px 20px; margin: 12px 0; font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-2); line-height: 1.9; overflow-x: auto; white-space: pre-wrap; }
+
+        /* Results grid */
+        .results-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+        .result-card { padding: 18px 20px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); }
+        .result-card h4 { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); opacity: 0.7; margin-bottom: 10px; letter-spacing: 0.05em; }
+        .result-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .result-card ul li { font-size: 0.86rem; color: var(--text); padding-left: 16px; position: relative; line-height: 1.6; }
+        .result-card ul li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); opacity: 0.6; font-size: 0.7rem; }
+
+        /* Lessons */
+        .lessons-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; }
+        .lesson { padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); }
+        .lesson p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 0; }
+        .lesson strong { color: var(--accent); }
+
+        @media (min-width: 600px) {
+            .results-grid { grid-template-columns: 1fr 1fr; }
+            .lessons-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="lab-page">
+
+        <a href="../index.html#upskilling" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <header class="lab-header">
+            <div class="lab-meta-row">
+                <span class="lab-type mono">// home_lab · automation</span>
+                <span class="lab-badge badge-soar">SOAR</span>
+                <span class="lab-badge badge-ai">IA Generativa</span>
+                <span class="lab-badge badge-homelab">Home Lab</span>
+            </div>
+            <h1>SOAR Automation —<br>Análisis Automático de Logs con IA</h1>
+            <p class="lead">
+                Pipeline de automatización completo para análisis de amenazas usando n8n como plataforma SOAR. 
+                El sistema recibe logs de seguridad via Slack, extrae IOCs con Gemini, los enriquece con 
+                AbuseIPDB y VirusTotal, mapea técnicas MITRE ATT&CK y entrega un reporte profesional 
+                en segundos — sin intervención manual.
+            </p>
+        </header>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// plataforma</span>
+                <span class="info-value">n8n (self-hosted)</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// ia</span>
+                <span class="info-value">Google Gemini 2.0 Flash</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// fuentes</span>
+                <span class="info-value">AbuseIPDB · VirusTotal</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// canal</span>
+                <span class="info-value">Slack (entrada y salida)</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// tipo</span>
+                <span class="info-value">Home Lab · Automatización</span>
+            </div>
+        </div>
+
+        <!-- Objetivo -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 01_objetivo</p>
+            <h2>Objetivo</h2>
+            <p>
+                Construir un pipeline SOAR funcional que automatice el proceso de análisis inicial de 
+                alertas de seguridad — el trabajo repetitivo que ocupa gran parte del tiempo de un 
+                analista SOC Tier 1. El sistema debe ser agnóstico al formato del log: funcionar 
+                igual con salidas de Wazuh, LetsDefend, Palo Alto o cualquier otro origen.
+            </p>
+            <p>
+                El objetivo final es que el analista reciba directamente en Slack un reporte completo 
+                con IOCs extraídos, enriquecimiento de múltiples fuentes, mapeo MITRE ATT&CK y 
+                acciones recomendadas — reduciendo el tiempo de triage de minutos a segundos.
+            </p>
+        </div>
+
+        <!-- Stack -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 02_stack</p>
+            <h2>Stack tecnológico</h2>
+
+            <div class="stack-grid">
+                <div class="stack-item">
+                    <span class="stack-icon">⚙️</span>
+                    <span class="stack-name">n8n</span>
+                    <span class="stack-role">Plataforma SOAR</span>
+                </div>
+                <div class="stack-item">
+                    <span class="stack-icon">💬</span>
+                    <span class="stack-name">Slack</span>
+                    <span class="stack-role">Entrada y salida</span>
+                </div>
+                <div class="stack-item">
+                    <span class="stack-icon">🤖</span>
+                    <span class="stack-name">Gemini 2.0</span>
+                    <span class="stack-role">Extracción de IOCs y análisis</span>
+                </div>
+                <div class="stack-item">
+                    <span class="stack-icon">🛡️</span>
+                    <span class="stack-name">AbuseIPDB</span>
+                    <span class="stack-role">Reputación de IPs</span>
+                </div>
+                <div class="stack-item">
+                    <span class="stack-icon">🦠</span>
+                    <span class="stack-name">VirusTotal</span>
+                    <span class="stack-role">IPs, hashes, dominios</span>
+                </div>
+                <div class="stack-item">
+                    <span class="stack-icon">📜</span>
+                    <span class="stack-name">JavaScript</span>
+                    <span class="stack-role">Normalización de datos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arquitectura -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 03_arquitectura</p>
+            <h2>Arquitectura del flujo</h2>
+
+            <div class="flow-diagram">
+                <div class="flow-node"><span class="flow-box flow-trigger">Slack Trigger</span><span class="flow-dim">// recibe el log del analista o posible IOC</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-ai">Gemini: Extractor de IOCs</span><span class="flow-dim">// extrae IPs, hashes, dominios, CVEs, comandos</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-code">Code: Normalizar</span><span class="flow-dim">// parsea JSON y estructura datos</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-api">AbuseIPDB HTTP Request</span><span class="flow-dim">// reputación IP atacante</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-code">Normalise AbuseIP</span><span class="flow-dim">// extrae puntaje, país, ISP, reportes</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-api">VT IP HTTP Request</span><span class="flow-dim">// análisis VirusTotal de la IP</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-code">Normalizador VT IP</span><span class="flow-dim">// detecciones y motores maliciosos</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-api">VT Hashes · VT Archivos · VT Dominios</span><span class="flow-dim">// enriquecimiento adicional</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-ai">Gemini: Análisis Final</span><span class="flow-dim">// genera reporte completo con MITRE ATT&CK</span></div>
+                <div class="flow-node"><span class="flow-arrow">↓</span></div>
+                <div class="flow-node"><span class="flow-box flow-output">Slack: Reporte</span><span class="flow-dim">// entrega al analista</span></div>
+            </div>
+
+            <!-- SCREENSHOT 1 -->
+            <div class="screenshot-block">
+                <div class="screenshot-placeholder">
+                  <img 
+                    src="../img/home-lab-n8n.png"
+                    alt="Arquitectura del home lab: La distribucion de los nodos en n8n." 
+                    style="width: 100%; display: block;"
+                  >
+                </div>
+                <div class="screenshot-caption">
+                    <i class="fas fa-image fa-xs"></i> &nbsp;Workflow completo en n8n — 13 nodos en secuencia
+                </div>
+            </div>
+        </div>
+
+        <!-- Componentes -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 04_componentes</p>
+            <h2>Componentes detallados</h2>
+
+            <div class="components">
+
+                <!-- 1. Slack Trigger -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">01</span>
+                        <span class="component-name">Slack Trigger</span>
+                        <span class="component-type type-slack">Slack</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Captura cualquier mensaje enviado al canal configurado. El mensaje contiene el log de seguridad a analizar — puede ser cualquier formato: Wazuh, LetsDefend, Palo Alto, o texto libre.</p>
+                    </div>
+                </div>
+
+                <!-- 2. Gemini Extractor -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">02</span>
+                        <span class="component-name">Gemini: Extractor de IOCs</span>
+                        <span class="component-type type-ai">IA · Gemini 2.0</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Primer nodo de IA. Recibe el log crudo y extrae todos los IOCs sin importar el formato. Devuelve JSON puro con IPs, hashes, dominios, CVEs, comandos y más.</p>
+
+                        <div class="prompt-block">Eres un extractor de IOCs de seguridad. Analiza el siguiente log y extrae todos los indicadores de compromiso que encuentres sin importar el formato del log.
+
+Devuelve ÚNICAMENTE un objeto JSON válido, sin explicaciones, sin markdown, sin bloques de código.
+
+{
+  "ips": [], "ip_origen": null, "ip_destino": null,
+  "dominios": [], "urls": [], "hashes": [],
+  "archivos": [], "cves": [], "comandos": [],
+  "usuarios": [], "puertos": [], "hostname": null, "raw_log": ""
+}
+
+LOG A ANALIZAR: {{ $json.text }}</div>
+
+                        <!-- SCREENSHOT 2 -->
+                        <div class="screenshot-block">
+                            <div class="screenshot-placeholder">
+                                 <img 
+                                    src="../img/home-lab-ia-estrac.png"
+                                    alt="Imagen de las IOC capturadas por la IA." 
+                                    style="width: 100%; display: block;"
+                                >
+                            </div>
+                            <div class="screenshot-caption">
+                                <i class="fas fa-image fa-xs"></i> &nbsp;Nodo Gemini Extractor — output JSON con IOCs extraídos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Normalizar -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">03</span>
+                        <span class="component-name">Code: Normalizar</span>
+                        <span class="component-type type-code">JavaScript</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Parsea el JSON de Gemini y estructura los datos para el resto del flujo. Agrega flags <code>_tiene</code> para indicar qué IOCs están presentes y evitar errores en nodos posteriores cuando algún IOC no existe.</p>
+
+                        <div class="code-block">
+<span class="comment">// Fragmento clave — parseo seguro del JSON de Gemini</span>
+<span class="key">const</span> <span class="val">item</span> = $input.first();
+<span class="key">const</span> <span class="val">rawText</span> = item.json.content?.parts?.[0]?.text || <span class="str">""</span>;
+
+<span class="key">let</span> <span class="val">iocs</span> = {};
+<span class="key">try</span> {
+  <span class="key">const</span> <span class="val">clean</span> = rawText.replace(<span class="str">/```json|```/g</span>, <span class="str">''</span>).trim();
+  iocs = JSON.parse(clean);
+} <span class="key">catch</span> (e) { iocs = {}; }
+
+<span class="comment">// Flags de presencia para control de flujo</span>
+_tiene: {
+  ip:      (iocs.ips || []).length > 0,
+  hash:    (iocs.hashes || []).length > 0,
+  archivo: (iocs.archivos || []).length > 0,
+  dominio: (iocs.dominios || []).length > 0
+}</div>
+
+                        <!-- SCREENSHOT 3 -->
+                        <div class="screenshot-block">
+                            <div class="screenshot-placeholder">
+                                <img 
+                                    src="../img/home-lab-normaliza1.png"
+                                    alt="Nodo Normalizar con todos los campos estructurados" 
+                                    style="width: 100%; display: block;"
+                                >
+                            </div>
+                            <div class="screenshot-caption">
+                                <i class="fas fa-image fa-xs"></i> &nbsp;Code Node — objeto normalizado con flags _tiene
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. AbuseIPDB -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">04</span>
+                        <span class="component-name">AbuseIPDB HTTP Request</span>
+                        <span class="component-type type-api">API</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Consulta la reputación de la IP atacante contra la base de datos de AbuseIPDB — devuelve puntaje de abuso, país, ISP, total de reportes y fecha del último reporte.</p>
+                        <div class="code-block">
+<span class="comment">// Configuración del nodo HTTP Request</span>
+Method: GET
+URL: https://api.abuseipdb.com/api/v2/check
+     ?ipAddress=<span class="str">{{ $json.ip_atacante }}</span>
+     &maxAgeInDays=90
+Header: Key: <span class="str">TU_API_KEY</span>
+Continue on Fail: <span class="val">ON</span> <span class="comment">// esencial para mantener el flujo</span></div>
+                    </div>
+                </div>
+
+                <!-- 5-11. VT Nodes -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">06–11</span>
+                        <span class="component-name">VirusTotal — IPs, Hashes, Archivos, Dominios</span>
+                        <span class="component-type type-api">API</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Cuatro nodos HTTP Request que consultan VirusTotal para cada tipo de IOC. Cada nodo va seguido de un normalizador JavaScript que extrae detecciones y motores maliciosos del response.</p>
+                        <div class="code-block">
+<span class="comment">// URLs según tipo de IOC</span>
+IP:      https://www.virustotal.com/api/v3/ip_addresses/<span class="str">{{ $json.ip_atacante }}</span>
+Hash:    https://www.virustotal.com/api/v3/files/<span class="str">{{ $json.hash_archivo }}</span>
+Archivo: https://www.virustotal.com/api/v3/files/<span class="str">{{ $json.archivo }}</span>
+Dominio: https://www.virustotal.com/api/v3/domains/<span class="str">{{ $json.dominio }}</span></div>
+
+                        <!-- SCREENSHOT 4 -->
+                        <div class="screenshot-block">
+                            <div class="screenshot-placeholder">
+                                <img 
+                                    src="../img/home-lab-normaliza2.png"
+                                    alt="Ejemplo de respuesta de VirusTotal con detecciones 29/61" 
+                                    style="width: 100%; display: block;"
+                                >
+                            </div>
+                            <div class="screenshot-caption">
+                                <i class="fas fa-image fa-xs"></i> &nbsp;VirusTotal response — detecciones de hash malicioso
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. Gemini Análisis Final -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">12</span>
+                        <span class="component-name">Gemini: Análisis Final</span>
+                        <span class="component-type type-ai">IA · Gemini 2.0</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Recibe el objeto consolidado con todos los datos de enriquecimiento y genera el reporte completo en formato Slack. Incluye descripción del ataque, severidad, técnicas MITRE ATT&CK y acciones recomendadas.</p>
+                        <p>El prompt usa sintaxis nativa de Slack (<code>*negrita*</code>, <code>_cursiva_</code>, emojis) para que el reporte se vea profesional directamente en el canal sin procesamiento adicional.</p>
+
+                        <div class="prompt-block">Formato de salida del reporte:
+
+:mag: *¿Qué ocurrió?*
+Descripción clara del ataque con IOCs clave y datos de enriquecimiento.
+
+:warning: *Nivel de severidad: [CRÍTICO / ALTO / MEDIO / BAJO]*
+Justificación basada en datos concretos.
+
+:dart: *MITRE ATT&CK*
+- *Táctica:* [nombre] | *Técnica:* [ID] — [nombre]
+
+:hammer_and_wrench: *Acciones recomendadas*
+Lista de 3 a 5 acciones concretas e inmediatas.</div>
+                    </div>
+                </div>
+
+                <!-- 13. Slack Reporte -->
+                <div class="component">
+                    <div class="component-header">
+                        <span class="component-num">13</span>
+                        <span class="component-name">Slack: Reporte Final</span>
+                        <span class="component-type type-slack">Slack</span>
+                    </div>
+                    <div class="component-body">
+                        <p>Envía el reporte generado por Gemini al canal de Slack configurado. El analista recibe el análisis completo en segundos, listo para tomar decisiones.</p>
+
+                        <!-- SCREENSHOT 5 -->
+                        <div class="screenshot-block">
+                            <div class="screenshot-placeholder">
+                                <img 
+                                    src="../img/home-lab-slack1.png"
+                                    alt="Reporte final recibido en Slack — Ejemplo 1 (LotL con regsvr32)" 
+                                    style="width: 100%; display: block;"
+                                >
+                            </div>
+                            <div class="screenshot-caption">
+                                <i class="fas fa-image fa-xs"></i> &nbsp;Reporte completo en Slack — amenaza crítica con MITRE ATT&CK mapeado
+                            </div>
+                        </div>
+
+                        <!-- SCREENSHOT 6 -->
+                        <div class="screenshot-block">
+                            <div class="screenshot-placeholder">
+                                <img 
+                                    src="../img/home-lab-slack2.png"
+                                    alt="Reporte final recibido en Slack — Ejemplo 2 (CVE-2024-3400)" 
+                                    style="width: 100%; display: block;"
+                                >
+                            </div>
+                            <div class="screenshot-caption">
+                                <i class="fas fa-image fa-xs"></i> &nbsp;Reporte completo en Slack — CVE Palo Alto con command injection
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 05_resultados</p>
+            <h2>Resultados obtenidos</h2>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <h4>// ejemplo_1 — LotL con regsvr32</h4>
+                    <ul>
+                        <li>Identificó técnica Living-off-the-Land con regsvr32</li>
+                        <li>Detectó typosquatting de Microsoft en el dominio</li>
+                        <li>29/61 motores VT confirmaron hash malicioso</li>
+                        <li>Severidad CRÍTICA con justificación técnica</li>
+                        <li>5 acciones de respuesta concretas generadas</li>
+                        <li>MITRE T1218.010 · T1566.001 · T1071.001 mapeados</li>
+                    </ul>
+                </div>
+                <div class="result-card">
+                    <h4>// ejemplo_2 — CVE-2024-3400 Palo Alto</h4>
+                    <ul>
+                        <li>Identificó explotación de CVE-2024-3400</li>
+                        <li>Detectó command injection en cookie de sesión</li>
+                        <li>Identificó técnica de path traversal</li>
+                        <li>Mapeo MITRE ATT&CK correcto</li>
+                        <li>Reporte generado desde log estructurado</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 06_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>El flujo secuencial es más estable que las ramas paralelas.</strong> En n8n, para este caso de uso, encadenar los nodos en secuencia y acumular datos con JavaScript es más confiable que usar ramas paralelas que pueden generar condiciones de carrera.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Referenciar nodos por nombre es más confiable que $input.</strong> Usar <code>$('nombre').first().json</code> en lugar de <code>$input</code> cuando hay múltiples fuentes evita ambigüedades y hace el flujo más predecible.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Gemini como extractor hace el workflow agnóstico al formato.</strong> Al delegar la extracción de IOCs a la IA, el pipeline funciona igual con cualquier formato de log — no requiere parsers específicos por cada fuente.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Continue on Fail: ON es esencial en todos los HTTP Requests.</strong> Cuando una IP no tiene registros en AbuseIPDB o un hash no existe en VirusTotal, el flujo debe continuar con <code>null</code> en ese campo, no detenerse con error.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">Lab · SOAR Automation · n8n + Gemini</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

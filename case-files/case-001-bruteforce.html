@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE-002 · Brute Force SSH — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .case-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 40px;
+            transition: all var(--transition);
+        }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+
+        /* Header */
+        .case-header { margin-bottom: 40px; }
+
+        .case-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .case-id-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--accent);
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+        }
+
+        .case-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-tp {
+            background: rgba(255, 80, 80, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 80, 80, 0.2);
+        }
+
+        .badge-closed {
+            background: rgba(0, 200, 120, 0.08);
+            color: #00c878;
+            border: 1px solid rgba(0, 200, 120, 0.2);
+        }
+
+        .case-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-bright);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .case-header p.lead {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.75;
+            max-width: 680px;
+        }
+
+        /* Info bar */
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 18px 20px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+
+        .info-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.08em;
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-2);
+        }
+
+        .info-value.critical { color: #ff6b6b; }
+        .info-value.confirmed { color: #00c878; }
+
+        /* Sections */
+        .case-section { margin-bottom: 48px; }
+
+        .case-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .case-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .case-section p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 14px;
+        }
+
+        .case-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .case-section ul li {
+            font-size: 0.9rem;
+            color: var(--text);
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .case-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.5;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        /* Timeline del ataque */
+        .attack-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .attack-timeline::before {
+            content: '';
+            position: absolute;
+            left: 80px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .tl-item {
+            display: flex;
+            gap: 20px;
+            padding: 16px 0;
+        }
+
+        .tl-time {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text);
+            opacity: 0.5;
+            min-width: 72px;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        .tl-dot-wrap {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 6px;
+        }
+
+        .tl-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .tl-dot.high { background: #ff6b6b; opacity: 0.8; }
+
+        .tl-content { flex: 1; padding-left: 8px; }
+
+        .tl-content strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-2);
+            margin-bottom: 3px;
+        }
+
+        .tl-content p {
+            font-size: 0.84rem;
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Evidence table */
+        .evidence-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 20px 0;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .ev-row {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ev-row:last-child { border-bottom: none; }
+
+        .ev-key {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            opacity: 0.7;
+            padding: 10px 16px;
+            min-width: 180px;
+            background: rgba(0,0,0,0.15);
+            border-right: 1px solid var(--border);
+        }
+
+        .ev-val {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-2);
+            padding: 10px 16px;
+            flex: 1;
+        }
+
+        .ev-val.danger { color: #ff6b6b; }
+        .ev-val.ok { color: #00c878; }
+
+        /* Alert samples */
+        .alert-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .alert-card {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .alert-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--bg-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .alert-card-header span {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-2);
+        }
+
+        .alert-level {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .level-10 {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .level-5 {
+            background: rgba(255, 200, 0, 0.1);
+            color: #ffc800;
+            border: 1px solid rgba(255, 200, 0, 0.2);
+        }
+
+        .level-8 {
+            background: rgba(255, 140, 0, 0.1);
+            color: #ff8c00;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+
+        .alert-card-body {
+            padding: 14px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            line-height: 2;
+        }
+
+        .ak { color: var(--text); opacity: 0.55; }
+        .av { color: var(--text-2); }
+        .av-accent { color: var(--accent); }
+        .av-danger { color: #ff6b6b; }
+        .av-warn { color: #ffc800; }
+
+        /* MITRE */
+        .mitre-block {
+            padding: 20px 24px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        .mitre-block .mitre-id {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .mitre-block .mitre-name {
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mitre-block p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .mitre-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        /* Screenshot placeholder */
+        .screenshot-block {
+            margin: 28px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .screenshot-block img {
+            width: 100%;
+            display: block;
+        }
+
+        .screenshot-caption {
+            padding: 10px 16px;
+            background: var(--bg-2);
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        /* Actions */
+        .actions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .action-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .action-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            opacity: 0.5;
+            min-width: 24px;
+            padding-top: 1px;
+        }
+
+        .action-item p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        .action-item strong { color: var(--text-2); }
+
+        /* Lessons */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .lesson {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+        }
+
+        .lesson p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .lesson strong { color: var(--accent); }
+
+        /* Verdict */
+        .verdict-block {
+            padding: 24px;
+            background: rgba(255, 107, 107, 0.04);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        .verdict-block .verdict-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: #ff6b6b;
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .verdict-block p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        @media (min-width: 600px) {
+            .alert-grid { grid-template-columns: 1fr 1fr; }
+            .lessons-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="case-page">
+
+        <!-- Back -->
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <!-- Header -->
+        <header class="case-header">
+            <div class="case-meta-row">
+                <span class="case-id-label mono">// CASE-002</span>
+                <span class="case-badge badge-tp">True Positive</span>
+                <span class="case-badge badge-closed">Cerrado</span>
+            </div>
+            <h1>Ataque de Fuerza Bruta SSH<br>Detectado con Wazuh SIEM</h1>
+            <p class="lead">
+                Detección y análisis de un ataque de fuerza bruta SSH contra un endpoint Linux monitorizado. 
+                1.183 intentos de autenticación fallidos en menos de 3 minutos, generados desde Kali Linux 
+                con Hydra, correlacionados automáticamente con MITRE ATT&CK T1110.
+            </p>
+        </header>
+
+        <!-- Info bar -->
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// fecha</span>
+                <span class="info-value">28 Mayo 2026</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// severidad</span>
+                <span class="info-value critical">Alta (Nivel 10)</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// fuente</span>
+                <span class="info-value">Home Lab · Wazuh SIEM</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// clasificación</span>
+                <span class="info-value confirmed">True Positive</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// mitre</span>
+                <span class="info-value">T1110 · Brute Force</span>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="case-section">
+            <p class="case-section-title">// 01_resumen</p>
+            <h2>Resumen ejecutivo</h2>
+            <p>
+                El SIEM Wazuh detectó un ataque de fuerza bruta SSH originado desde 
+                <strong>192.168.0.107</strong> (Kali Linux) contra el endpoint 
+                <strong>ubuntuserver (192.168.0.103)</strong>. El ataque duró aproximadamente 
+                3 minutos, generando 1.183 intentos de autenticación fallidos sin ningún 
+                acceso exitoso.
+            </p>
+            <p>
+                El atacante apuntó exclusivamente al usuario <strong>root</strong>, utilizando 
+                la wordlist rockyou.txt con la herramienta Hydra a una tasa de ~66 intentos 
+                por minuto. Wazuh correlacionó automáticamente los eventos con la táctica 
+                <strong>Credential Access</strong> del framework MITRE ATT&CK, activando 
+                alertas de nivel 5, 8 y 10.
+            </p>
+
+            <div class="verdict-block">
+                <p class="verdict-label">// veredicto</p>
+                <p>
+                    <strong>True Positive confirmado.</strong> Ataque de fuerza bruta SSH real contra endpoint monitorizado. 
+                    Sin acceso exitoso. Endpoint aislado para análisis. Se recomienda implementar fail2ban, 
+                    deshabilitar login de root por SSH y considerar autenticación por clave pública.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidencia -->
+        <div class="case-section">
+            <p class="case-section-title">// 02_evidencia</p>
+            <h2>Evidencia técnica</h2>
+
+            <div class="evidence-grid">
+                <div class="ev-row">
+                    <span class="ev-key">IP atacante</span>
+                    <span class="ev-val danger">192.168.0.107 (Kali Linux)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP víctima</span>
+                    <span class="ev-val">192.168.0.103 (ubuntuserver)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Puerto objetivo</span>
+                    <span class="ev-val">22 / TCP (SSH)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Usuario objetivo</span>
+                    <span class="ev-val danger">root</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Herramienta usada</span>
+                    <span class="ev-val">Hydra + wordlist rockyou.txt</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Intentos fallidos</span>
+                    <span class="ev-val danger">1.183</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Intentos exitosos</span>
+                    <span class="ev-val ok">0</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Tasa de ataque</span>
+                    <span class="ev-val">~66 intentos/minuto · 4 hilos</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Inicio del ataque</span>
+                    <span class="ev-val">28 May 2026 · 21:17:55 UTC</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Fin del ataque</span>
+                    <span class="ev-val">28 May 2026 · 21:20:35 UTC</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Duración</span>
+                    <span class="ev-val">2 minutos 40 segundos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="case-section">
+            <p class="case-section-title">// 03_timeline</p>
+            <h2>Línea de tiempo del ataque</h2>
+
+            <div class="attack-timeline">
+                <div class="tl-item">
+                    <span class="tl-time">21:17:55</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Inicio del ataque</strong>
+                        <p>Primera autenticación fallida detectada. Wazuh activa regla 5760 (nivel 5) — sshd: authentication failed.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">21:17:58</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Umbral de intentos múltiples superado</strong>
+                        <p>Wazuh activa regla 5758 (nivel 8) — Maximum authentication attempts exceeded. El patrón de múltiples fallos desde la misma IP queda registrado.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">21:18:02</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Alerta de alta severidad</strong>
+                        <p>Wazuh activa regla 2502 (nivel 10) — User missed the password more than one time. Correlación automática con MITRE T1110 Brute Force, táctica Credential Access.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">21:17 – 21:20</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Ataque sostenido — 1.183 intentos</strong>
+                        <p>Hydra mantiene 4 hilos activos contra el usuario root a ~66 intentos/minuto. Ningún intento resulta exitoso.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">21:20:35</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Fin del ataque</strong>
+                        <p>Último evento registrado. Ataque detenido manualmente. El endpoint no fue comprometido.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="case-section">
+            <p class="case-section-title">// 04_alertas</p>
+            <h2>Alertas generadas por Wazuh</h2>
+            <p>Tres reglas se activaron durante el ataque, escalando en severidad conforme aumentaban los intentos fallidos.</p>
+
+            <div class="alert-grid">
+                <div class="alert-card">
+                    <div class="alert-card-header">
+                        <span>Rule ID 5760</span>
+                        <span class="alert-level level-5">Nivel 5</span>
+                    </div>
+                    <div class="alert-card-body">
+                        <span class="ak">description  </span><span class="av-warn">sshd: authentication failed.</span><br>
+                        <span class="ak">srcip        </span><span class="av-danger">192.168.0.107</span><br>
+                        <span class="ak">dstuser      </span><span class="av-danger">root</span><br>
+                        <span class="ak">agent        </span><span class="av">ubuntuserver</span><br>
+                        <span class="ak">frecuencia   </span><span class="av">Más repetida del evento</span>
+                    </div>
+                </div>
+
+                <div class="alert-card">
+                    <div class="alert-card-header">
+                        <span>Rule ID 5758</span>
+                        <span class="alert-level level-8">Nivel 8</span>
+                    </div>
+                    <div class="alert-card-body">
+                        <span class="ak">description  </span><span class="av-warn">Maximum authentication attempts exceeded.</span><br>
+                        <span class="ak">srcip        </span><span class="av-danger">192.168.0.107</span><br>
+                        <span class="ak">dstuser      </span><span class="av-danger">root</span><br>
+                        <span class="ak">agent        </span><span class="av">ubuntuserver</span><br>
+                        <span class="ak">trigger      </span><span class="av">Umbral de intentos superado</span>
+                    </div>
+                </div>
+
+                <div class="alert-card">
+                    <div class="alert-card-header">
+                        <span>Rule ID 2502</span>
+                        <span class="alert-level level-10">Nivel 10</span>
+                    </div>
+                    <div class="alert-card-body">
+                        <span class="ak">description  </span><span class="av-danger">User missed the password more than one time.</span><br>
+                        <span class="ak">srcip        </span><span class="av-danger">192.168.0.107</span><br>
+                        <span class="ak">dstuser      </span><span class="av-danger">root</span><br>
+                        <span class="ak">mitre.id     </span><span class="av-accent">T1110</span><br>
+                        <span class="ak">tactic       </span><span class="av">Credential Access</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAPTURA DE PANTALLA -->
+            <div class="screenshot-block">
+                <img src="../img/case-001-dashboard.png" alt="Dashboard de Wazuh mostrando las alertas del ataque de fuerza bruta SSH">
+                <div class="screenshot-caption">
+                    <i class="fas fa-image fa-xs"></i> &nbsp;Dashboard Wazuh — Security Events durante el ataque · 28 Mayo 2026
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MITRE -->
+        <div class="case-section">
+            <p class="case-section-title">// 05_mitre</p>
+            <h2>Mapeo MITRE ATT&CK</h2>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1110 — Brute Force</div>
+                <div class="mitre-name">Táctica: Credential Access</div>
+                <p>
+                    El adversario intentó obtener acceso al sistema probando múltiples contraseñas 
+                    contra el usuario root mediante SSH. Esta técnica busca acceder a cuentas 
+                    válidas mediante fuerza bruta, especialmente contra servicios de acceso remoto 
+                    expuestos como SSH. El uso de Hydra con rockyou.txt es un patrón clásico 
+                    de T1110.001 (Password Guessing).
+                </p>
+                <div class="mitre-tags">
+                    <span class="tag">T1110 · Brute Force</span>
+                    <span class="tag">T1110.001 · Password Guessing</span>
+                    <span class="tag">Credential Access</span>
+                    <span class="tag">TA0006</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 06_acciones</p>
+            <h2>Acciones tomadas</h2>
+
+            <div class="actions-list">
+                <div class="action-item">
+                    <span class="action-num">01</span>
+                    <p><strong>Identificación del origen:</strong> IP atacante 192.168.0.107 identificada como Kali Linux del lab. En un entorno real esta IP sería externa o de un segmento no autorizado.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">02</span>
+                    <p><strong>Correlación de alertas:</strong> Análisis de las tres reglas activadas (5760 → 5758 → 2502) confirmando escalada de severidad consistente con ataque de fuerza bruta sostenido.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">03</span>
+                    <p><strong>Verificación de acceso exitoso:</strong> Confirmado 0 autenticaciones exitosas. El endpoint no fue comprometido durante el ataque.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">04</span>
+                    <p><strong>Clasificación:</strong> True Positive confirmado. Ataque de fuerza bruta SSH real con patrón, origen, objetivo y herramienta identificados.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">05</span>
+                    <p><strong>Escalamiento:</strong> En un entorno productivo este caso se escalaría a Tier 2 para bloqueo de IP, revisión de otros endpoints y análisis de movimiento lateral potencial.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 07_recomendaciones</p>
+            <h2>Recomendaciones</h2>
+            <ul>
+                <li>Implementar <strong>fail2ban</strong> para bloquear automáticamente IPs con múltiples fallos de autenticación SSH</li>
+                <li>Deshabilitar el login de <strong>root por SSH</strong> — usar usuario no privilegiado con sudo</li>
+                <li>Migrar a <strong>autenticación por clave pública</strong> y deshabilitar autenticación por contraseña</li>
+                <li>Cambiar el puerto SSH del 22 a un puerto no estándar para reducir ruido de bots automatizados</li>
+                <li>Configurar regla de alerta en Wazuh para notificación inmediata ante nivel 10 o superior</li>
+                <li>Revisar si otros endpoints del segmento recibieron intentos similares desde la misma IP</li>
+            </ul>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 08_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>Wazuh escala la severidad automáticamente.</strong> El sistema detectó el patrón de intentos múltiples y escaló de nivel 5 a nivel 10 sin configuración adicional, activando las reglas correctas en el orden correcto.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>El usuario objetivo importa.</strong> Apuntar exclusivamente a root es una señal clara de ataque automatizado — un humano probaría múltiples usuarios. Este patrón de usuario único facilita la detección.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>La tasa de ataque es evidencia.</strong> 66 intentos por minuto desde puertos efímeros distintos pero hacia el mismo destino y usuario confirma el uso de una herramienta automatizada como Hydra.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>0 accesos exitosos no significa 0 riesgo.</strong> Un atacante con más tiempo y una wordlist más específica podría haber tenido éxito. La detección temprana y el bloqueo automático son críticos.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">CASE-002 · Brute Force SSH</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Lab · Wazuh SIEM — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* ── LAB PAGE SPECIFIC ── */
+        .lab-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 40px;
+            transition: all var(--transition);
+        }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+
+        /* Header */
+        .lab-header { margin-bottom: 40px; }
+
+        .lab-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .lab-type {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--accent);
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+        }
+
+        .lab-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-infra {
+            background: rgba(0, 140, 255, 0.1);
+            color: #4db8ff;
+            border: 1px solid rgba(0, 140, 255, 0.2);
+        }
+
+        .badge-siem {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--tag-border);
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-bright);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .lab-header p.lead {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.75;
+            max-width: 680px;
+        }
+
+        /* Info bar */
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 18px 20px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+
+        .info-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.08em;
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-2);
+        }
+
+        /* Sections */
+        .lab-section { margin-bottom: 48px; }
+
+        .lab-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .lab-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lab-section p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 14px;
+        }
+
+        .lab-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .lab-section ul li {
+            font-size: 0.9rem;
+            color: var(--text);
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .lab-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.5;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        /* Architecture diagram */
+        .arch-diagram {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            margin: 24px 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-2);
+            line-height: 1.9;
+            overflow-x: auto;
+        }
+
+        .arch-diagram .arch-accent { color: var(--accent); }
+        .arch-diagram .arch-dim { opacity: 0.4; }
+        .arch-diagram .arch-warn { color: var(--warn); }
+
+        /* Step blocks */
+        .steps { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all var(--transition);
+        }
+
+        .step:hover {
+            border-color: var(--border-light);
+            background: var(--bg-hover);
+        }
+
+        .step-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            opacity: 0.5;
+            min-width: 28px;
+            padding-top: 2px;
+        }
+
+        .step-content { flex: 1; }
+
+        .step-content strong {
+            display: block;
+            font-size: 0.92rem;
+            color: var(--text-bright);
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 0.86rem;
+            color: var(--text);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            overflow-x: auto;
+            line-height: 1.8;
+        }
+
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+
+        /* Challenge cards */
+        .challenges { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+
+        .challenge {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .challenge-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .challenge-icon {
+            color: var(--warn);
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .challenge strong {
+            font-size: 0.9rem;
+            color: var(--text-2);
+        }
+
+        .challenge p {
+            font-size: 0.86rem;
+            color: var(--text);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        .challenge .solution {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+            font-size: 0.84rem;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        /* Alert sample */
+        .alert-sample {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 20px 0;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 2;
+            overflow-x: auto;
+        }
+
+        .alert-key { color: var(--text); opacity: 0.6; }
+        .alert-val { color: var(--text-2); }
+        .alert-accent { color: var(--accent); }
+        .alert-warn { color: var(--warn); }
+
+        /* Lessons */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .lesson {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+        }
+
+        .lesson p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .lesson strong { color: var(--accent); }
+
+        /* Next steps */
+        .next-steps {
+            padding: 24px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-top: 16px;
+        }
+
+        .next-steps h3 {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            opacity: 0.7;
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+        }
+
+        @media (min-width: 600px) {
+            .lessons-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="lab-page">
+
+        <!-- Back -->
+        <a href="../index.html#upskilling" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <!-- Header -->
+        <header class="lab-header">
+            <div class="lab-meta-row">
+                <span class="lab-type mono">// home_lab</span>
+                <span class="lab-badge badge-infra">Infraestructura</span>
+                <span class="lab-badge badge-siem">SIEM</span>
+            </div>
+            <h1>Despliegue de SIEM Wazuh<br>en Home Lab con recursos limitados</h1>
+            <p class="lead">
+                Construcción de un entorno de monitoreo de seguridad funcional usando dos laptops, 
+                un SIEM open source y resolución de problemas reales de infraestructura. 
+                Sin entorno virtual costoso, sin guía paso a paso perfecta — solo diagnóstico y persistencia.
+            </p>
+        </header>
+
+        <!-- Info bar -->
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// fecha</span>
+                <span class="info-value">Mayo 2026</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// tipo</span>
+                <span class="info-value">Home Lab</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// herramientas</span>
+                <span class="info-value">Wazuh · Ubuntu Server · SSH · Kali Linux</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// resultado</span>
+                <span class="info-value">SIEM operativo con detección en tiempo real</span>
+            </div>
+        </div>
+
+        <!-- Objetivo -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 01_objetivo</p>
+            <h2>Objetivo</h2>
+            <p>
+                Construir un entorno de laboratorio SOC funcional con hardware disponible — sin presupuesto para 
+                servidores ni instancias cloud — capaz de recolectar logs, detectar eventos de seguridad y 
+                correlacionar alertas con el framework MITRE ATT&CK.
+            </p>
+            <p>
+                La restricción de recursos fue parte del desafío: máquinas con 8 GB y 2 GB de RAM, sin 
+                posibilidad de correr múltiples VMs pesadas simultáneamente. La solución tenía que ser 
+                eficiente y real.
+            </p>
+        </div>
+
+        <!-- Entorno -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 02_entorno</p>
+            <h2>Entorno y arquitectura</h2>
+
+            <div style="margin: 24px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+                <img 
+                    src="../img/estructura_homelab.png" 
+                    alt="Arquitectura del home lab: Laptop principal con Wazuh conectada via SSH a laptop secundaria HP con Ubuntu Server y Wazuh Agent" 
+                    style="width: 100%; display: block;"
+                >
+            </div>
+
+            <div class="tags">
+                <span class="tag">Zorin OS</span>
+                <span class="tag">Ubuntu Server 24.04</span>
+                <span class="tag">Wazuh 4.7.5</span>
+                <span class="tag">OpenSearch</span>
+                <span class="tag">Filebeat</span>
+                <span class="tag">Kali Linux</span>
+                <span class="tag">VirtualBox</span>
+                <span class="tag">SSH</span>
+            </div>
+        </div>
+
+        <!-- Proceso -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 03_proceso</p>
+            <h2>Proceso de implementación</h2>
+
+            <div class="steps">
+                <div class="step">
+                    <span class="step-num">01</span>
+                    <div class="step-content">
+                        <strong>Instalación de Ubuntu Server en la laptop secundaria</strong>
+                        <p>Grabación de ISO en pendrive con Balena Etcher, configuración de red WiFi mediante netplan y primera conexión SSH desde la laptop principal. Primer obstáculo resuelto: adaptador microSD causaba checksum failure durante la instalación.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-num">02</span>
+                    <div class="step-content">
+                        <strong>Configuración de red y SSH</strong>
+                        <p>Asignación de IPs fijas por MAC en el router doméstico (192.168.0.105 y 192.168.0.103). Instalación de openssh-server en la HP para administración remota sin necesidad de teclado físico.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-num">03</span>
+                    <div class="step-content">
+                        <strong>Despliegue de Wazuh con el instalador oficial</strong>
+                        <p>Uso del script <code>wazuh-install.sh -a -i</code> para instalación all-in-one de manager, indexer, dashboard y filebeat. Resolución del problema de compatibilidad con Zorin OS usando el flag <code>--ignore-check</code>.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-num">04</span>
+                    <div class="step-content">
+                        <strong>Registro del agente en la HP</strong>
+                        <p>Instalación del wazuh-agent versión 4.7.5 (compatible con el manager) en la laptop secundaria. Corrección manual de la IP del manager en ossec.conf después de identificar que la variable de entorno no se aplicó correctamente.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-num">05</span>
+                    <div class="step-content">
+                        <strong>Verificación y generación de primera alerta</strong>
+                        <p>Confirmación de agente activo en el dashboard. Primera alerta real: autenticación SSH desde Kali Linux con Hydra generando 416+ eventos de brute force detectados con mapeo automático a MITRE ATT&CK.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desafíos -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 04_desafios</p>
+            <h2>Desafíos encontrados y soluciones</h2>
+            <p>Esta sección documenta los problemas reales encontrados durante el despliegue. En un entorno SOC, la capacidad de diagnóstico ante fallos inesperados es tan importante como el conocimiento teórico.</p>
+
+            <div class="challenges">
+
+                <div class="challenge">
+                    <div class="challenge-header">
+                        <i class="fas fa-triangle-exclamation challenge-icon"></i>
+                        <strong>Checksum failure durante instalación de Ubuntu</strong>
+                    </div>
+                    <p>El instalador fallaba con "install media checksum verification failed" de forma repetida incluso con ISO verificado.</p>
+                    <p class="solution">▸ Causa: adaptador microSD a USB inestable. Solución: usar directamente una USB de 8gb para evitar inestabilidad.</p>
+                </div>
+
+                <div class="challenge">
+                    <div class="challenge-header">
+                        <i class="fas fa-triangle-exclamation challenge-icon"></i>
+                        <strong>Layout de teclado incorrecto en Ubuntu Server</strong>
+                    </div>
+                    <p>Ubuntu Server se instaló con layout en inglés, imposibilitando escribir caracteres especiales como guiones y barras necesarios para los comandos.</p>
+                    <p class="solution">▸ Solución: reinstalación con configuración correcta de localización desde el menú del instalador.</p>
+                </div>
+
+                <div class="challenge">
+                    <div class="challenge-header">
+                        <i class="fas fa-triangle-exclamation challenge-icon"></i>
+                        <strong>Wazuh Indexer fallando por certificados SSL faltantes</strong>
+                    </div>
+                    <p>Al instalar componentes por separado, el indexer no encontraba root-ca.pem y fallaba al iniciar. Error: "Unable to read the file /etc/wazuh-indexer/certs/root-ca.pem".</p>
+                    <p class="solution">▸ Solución: generar certificados con wazuh-certs-tool.sh y copiarlos manualmente con permisos correctos (400). Lección: usar el instalador oficial all-in-one en lugar de componentes separados.</p>
+                </div>
+
+                <div class="challenge">
+                    <div class="challenge-header">
+                        <i class="fas fa-triangle-exclamation challenge-icon"></i>
+                        <strong>Saturación de RAM con todos los servicios activos</strong>
+                    </div>
+                    <p>Wazuh Manager + Indexer + Dashboard consumían ~5.7 GB de los 7.7 GB disponibles, dejando sin margen para herramientas de ataque.</p>
+                    <p class="solution">▸ Solución: ampliar swap de 2 GB a 4 GB y gestionar servicios manualmente — parar indexer y dashboard al usar Kali, reactivarlos al analizar alertas.</p>
+                </div>
+
+                <div class="challenge">
+                    <div class="challenge-header">
+                        <i class="fas fa-triangle-exclamation challenge-icon"></i>
+                        <strong>Alertas generadas pero no visibles en el dashboard</strong>
+                    </div>
+                    <p>El manager generaba alertas en alerts.json pero el índice wazuh-alerts-* no se creaba en el indexer. Múltiples causas encadenadas: keystore sin credenciales, IP incorrecta del indexer en ossec.conf, Filebeat crasheando.</p>
+                    <p class="solution">▸ Solución final: reinstalación completa con wazuh-install.sh -a -i -o que configura correctamente todos los componentes y sus dependencias.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Alerta de ejemplo -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 05_resultados</p>
+            <h2>Resultados — Primera alerta real</h2>
+            <p>
+                Al ejecutar un ataque de fuerza bruta SSH con Hydra desde Kali Linux contra la laptop HP, 
+                el dashboard mostró 416+ alertas de autenticación. Ejemplo de un evento capturado:
+            </p>
+
+            <div class="alert-sample">
+<span class="alert-key">@timestamp          </span><span class="alert-val">2026-05-26T19:45:10.707Z</span>
+<span class="alert-key">agent.name          </span><span class="alert-accent">ubuntuserver</span>
+<span class="alert-key">agent.ip            </span><span class="alert-val">192.168.0.103</span>
+<span class="alert-key">rule.id             </span><span class="alert-val">5501</span>
+<span class="alert-key">rule.description    </span><span class="alert-accent">PAM: Login session opened.</span>
+<span class="alert-key">rule.level          </span><span class="alert-warn">3</span>
+<span class="alert-key">rule.mitre.id       </span><span class="alert-accent">T1078</span>
+<span class="alert-key">rule.mitre.tactic   </span><span class="alert-val">Defense Evasion · Persistence · Privilege Escalation · Initial Access</span>
+<span class="alert-key">rule.mitre.technique</span><span class="alert-val">Valid Accounts</span>
+<span class="alert-key">rule.pci_dss        </span><span class="alert-val">10.2.5</span>
+<span class="alert-key">rule.gdpr           </span><span class="alert-val">IV_32.2</span>
+<span class="alert-key">rule.nist_800_53    </span><span class="alert-val">AU.14 · AC.7</span>
+<span class="alert-key">location            </span><span class="alert-val">/var/log/auth.log</span>
+            </div>
+
+            <p>
+                El SIEM mapea automáticamente cada evento a MITRE ATT&CK, frameworks de cumplimiento 
+                (PCI DSS, GDPR, HIPAA, NIST 800-53) y asigna nivel de severidad. Exactamente la visibilidad 
+                que tiene un analista SOC Tier 1 en su trabajo diario.
+            </p>
+        </div>
+
+        <!-- Lecciones aprendidas -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 06_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>Los instaladores oficiales existen por algo.</strong> Intentar instalar componentes de Wazuh por separado genera problemas de certificados, versiones y dependencias que el script oficial resuelve automáticamente.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Los errores son el laboratorio real.</strong> Cada fallo de checksum, permiso denegado o servicio caído fue una oportunidad de diagnóstico que ninguna guía perfecta hubiera enseñado.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>La gestión de recursos es una habilidad operativa.</strong> Saber qué servicios pausar y cuándo, cómo ampliar swap, cómo priorizar procesos — todo esto es administración de sistemas real.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>SSH es la herramienta más importante del lab.</strong> Poder administrar la laptop secundaria de forma remota sin necesitar teclado ni pantalla transformó completamente la experiencia de trabajo.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Wazuh correlaciona más de lo esperado.</strong> Sin configuración adicional, el agente detectó automáticamente eventos PAM, sudo, gestión de usuarios y los mapeó a MITRE ATT&CK con cumplimiento normativo incluido.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>El hardware limitado no es excusa.</strong> Con dos laptops viejas, swap ampliada y gestión manual de servicios se construyó un entorno SOC completamente funcional.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos pasos -->
+        <div class="lab-section">
+            <p class="lab-section-title">// 07_proximos_pasos</p>
+            <h2>Próximos pasos</h2>
+
+            <div class="next-steps">
+                <h3>// en desarrollo</h3>
+                <ul>
+                    <li>Documentar ataque de fuerza bruta SSH completo como CASE-002 (análisis de las 416 alertas, patrón de ataque, decisión de escalamiento)</li>
+                    <li>Instalar Kali Linux con Guest Additions para flujo de trabajo más eficiente</li>
+                    <li>Configurar reglas de detección personalizadas en Wazuh para umbrales de alerta</li>
+                    <li>Generar ataques adicionales: escaneo de puertos, escalada de privilegios, persistencia</li>
+                    <li>Documentar cada ataque como case file independiente en el portafolio</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">Home Lab · Wazuh SIEM</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

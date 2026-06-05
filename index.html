@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>José Corrales · SOC Analyst</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="layout">
+
+        <!-- ═══════════ SIDEBAR ═══════════ -->
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+
+                <div class="status-bar">
+                    <span class="status-dot"></span>
+                    <span class="status-text">AVAILABLE FOR HIRE</span>
+                </div>
+
+                <div class="identity">
+                    <p class="identity-label">// analyst</p>
+                    <h1>José<br>Corrales<span class="accent">.</span></h1>
+                    <p class="role-line">SOC <span class="dim">·</span> Security Operations</p>
+                    <p class="level-badge">Entry-Level <span class="accent">▸</span> Open to Opportunities</p>
+                </div>
+
+                <p class="tagline">
+                    Alert triage · IOC analysis<br>
+                    Documentation · Escalation<br>
+                    Networking fundamentals
+                </p>
+
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="#about"><span class="nav-num">01</span><span class="nav-label">Sobre mí</span></a></li>
+                        <li><a href="#experience"><span class="nav-num">02</span><span class="nav-label">Experiencia</span></a></li>
+                        <li><a href="#education"><span class="nav-num">03</span><span class="nav-label">Educación</span></a></li>
+                        <li><a href="#lab-projects"><span class="nav-num">04</span><span class="nav-label">Proyectos</span></a></li>
+                        <li><a href="#projects"><span class="nav-num">05</span><span class="nav-label">SOC Case Files</span></a></li>
+                        <li><a href="#upskilling"><span class="nav-num">06</span><span class="nav-label">Formación</span></a></li>
+                        <li><a href="#contact"><span class="nav-num">07</span><span class="nav-label">Contacto</span></a></li>
+                    </ul>
+                </nav>
+
+                <div class="social-icons">
+                    <a href="https://github.com/jcorrales02" target="_blank" title="GitHub" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/jcorrales02" target="_blank" title="LinkedIn" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://www.credly.com/users/jose-corrales002/badges" target="_blank" title="Credly" aria-label="Credly">
+                        <i class="fas fa-certificate"></i>
+                    </a>
+                    <a href="https://tryhackme.com/p/jose002" target="_blank" title="TryHackMe" aria-label="TryHackMe">
+                        <i class="fas fa-terminal"></i>
+                    </a>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span class="mono dim">PA · Panamá</span>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ═══════════ CONTENT ═══════════ -->
+        <main class="content">
+
+            <!-- ── 01 ABOUT ── -->
+            <section id="about">
+                <div class="section-header">
+                    <span class="section-tag mono">_about</span>
+                    <h2>Sobre mí</h2>
+                    <div class="header-line"></div>
+                </div>
+                <div class="about-body">
+                    <p>
+                        Actualmente curso una <strong>Maestría en Ciberseguridad</strong> y estoy enfocando mi desarrollo hacia <strong>Operaciones SOC (entry-level)</strong>. Me interesa especialmente el trabajo operativo del día a día: mantener visibilidad, responder con orden y asegurar continuidad mediante procesos claros y repetibles.
+                    </p>
+                    <p>
+                        Me gusta el trabajo estructurado y orientado a proceso: <strong>monitoreo</strong>, análisis inicial de alertas (triage), recolección de evidencia, documentación, seguimiento y escalamiento oportuno. Mi base en redes y soporte me ha ayudado a desarrollar pensamiento de diagnóstico, atención al detalle y comunicación clara.
+                    </p>
+                    <p>
+                        Aunque mi experiencia SOC ha sido principalmente académica y de laboratorio, estoy comprometido con convertirla en evidencia real: por eso documento casos, aprendizajes y decisiones en <strong>SOC Case Files</strong>, con reportes cortos y recomendaciones accionables. Busco una oportunidad donde pueda aportar disciplina operativa y aprender rápido dentro de un equipo SOC.
+                    </p>
+                    <div class="skill-matrix">
+                        <div class="skill-group">
+                            <p class="skill-group-label mono">// core skills</p>
+                            <div class="tags">
+                                <span class="tag">Alert Triage</span>
+                                <span class="tag">IOC Analysis</span>
+                                <span class="tag">Incident Documentation</span>
+                                <span class="tag">Escalation</span>
+                                <span class="tag">Log Review</span>
+                            </div>
+                        </div>
+                        <div class="skill-group">
+                            <p class="skill-group-label mono">// tools & platforms</p>
+                            <div class="tags">
+                                <span class="tag">Wazuh</span>
+                                <span class="tag">Wireshark</span>
+                                <span class="tag">n8n SOAR</span>
+                                <span class="tag">AWS CloudTrail</span>
+                                <span class="tag">Linux</span>
+                                <span class="tag">Windows</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── 02 EXPERIENCE ── -->
+            <section id="experience">
+                <div class="section-header">
+                    <span class="section-tag mono">_experience</span>
+                    <h2>Experiencia</h2>
+                    <div class="header-line"></div>
+                </div>
+
+                <div class="timeline">
+
+                    <div class="timeline-item card-hover">
+                        <div class="timeline-meta">
+                            <span class="timeline-date mono">2026 – Presente</span>
+                            <span class="timeline-dot"></span>
+                        </div>
+                        <div class="timeline-body">
+                            <h3>Construcción de Home Lab SOC</h3>
+                            <p class="timeline-org">Proyecto personal · Entorno propio</p>
+                            <p>Despliegue y operación de un entorno de monitoreo de seguridad real con dos laptops físicas. Instalación de Wazuh (Manager + Indexer + Dashboard + Filebeat), configuración de agente en Ubuntu Server, resolución de problemas reales de infraestructura y detección de ataques simulados con Kali Linux. Alertas correlacionadas con MITRE ATT&CK en tiempo real.</p>
+                            <div class="tags mt">
+                                <span class="tag">Wazuh SIEM</span>
+                                <span class="tag">Ubuntu Server</span>
+                                <span class="tag">Kali Linux</span>
+                                <span class="tag">MITRE ATT&CK</span>
+                                <span class="tag">SSH</span>
+                                <span class="tag">Incident Detection</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item card-hover">
+                        <div class="timeline-meta">
+                            <span class="timeline-date mono">2023 – 2024</span>
+                            <span class="timeline-dot"></span>
+                        </div>
+                        <div class="timeline-body">
+                            <h3>Docente de Informática</h3>
+                            <p class="timeline-org">Educación secundaria · Panamá</p>
+                            <p>Enseñanza de fundamentos de informática. Desarrollo de habilidades de comunicación técnica clara, documentación estructurada y trabajo metódico — capacidades directamente transferibles al reporte de incidentes y comunicación con equipos no técnicos en un SOC.</p>
+                            <div class="tags mt">
+                                <span class="tag">Comunicación técnica</span>
+                                <span class="tag">Documentación</span>
+                                <span class="tag">Metodología</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item card-hover">
+                        <div class="timeline-meta">
+                            <span class="timeline-date mono">2013 – 2014</span>
+                            <span class="timeline-dot"></span>
+                        </div>
+                        <div class="timeline-body">
+                            <h3>Técnico en Soporte IT</h3>
+                            <p class="timeline-org">Independiente</p>
+                            <p>Diagnóstico y resolución de incidencias en equipos, instalación y optimización de sistemas operativos, mantenimiento preventivo/correctivo. Base de pensamiento analítico y registro estructurado de soluciones aplicado hoy al análisis de alertas.</p>
+                            <div class="tags mt">
+                                <span class="tag">Troubleshooting</span>
+                                <span class="tag">Windows</span>
+                                <span class="tag">Hardware/Software</span>
+                                <span class="tag">Documentation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── 03 EDUCATION ── -->
+            <section id="education">
+                <div class="section-header">
+                    <span class="section-tag mono">_education</span>
+                    <h2>Educación</h2>
+                    <div class="header-line"></div>
+                </div>
+
+                <div class="edu-list">
+
+                    <div class="edu-item card-hover">
+                        <div class="edu-icon-col">
+                            <div class="edu-icon edu-icon--active">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <div class="edu-connector"></div>
+                        </div>
+                        <div class="edu-body">
+                            <div class="edu-meta-row">
+                                <span class="edu-badge edu-badge--active">Maestría · En curso</span>
+                                <span class="edu-date mono">2024 – Presente</span>
+                            </div>
+                            <h3>Maestría en Ciberseguridad</h3>
+                            <a class="edu-inst" href="https://umecit.edu.pa/maestrias-postgrados/tecnologia-construccion-y-medio-ambiente/maestria-en-ciberseguridad/" target="_blank" rel="noopener noreferrer">
+                                UMECIT <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                            <p>Ciberdefensa, gestión de riesgos, respuesta ante incidentes y análisis forense.</p>
+                            <div class="tags mt">
+                                <span class="tag">Incident Response</span>
+                                <span class="tag">Risk Management</span>
+                                <span class="tag">Digital Forensics</span>
+                                <span class="tag">Cyber Defense</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-item card-hover">
+                        <div class="edu-icon-col">
+                            <div class="edu-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="edu-connector"></div>
+                        </div>
+                        <div class="edu-body">
+                            <div class="edu-meta-row">
+                                <span class="edu-badge">Especialización</span>
+                                <span class="edu-date mono">2022 – 2023</span>
+                            </div>
+                            <h3>Especialización en Ciberseguridad</h3>
+                            <a class="edu-inst" href="https://umecit.edu.pa/maestrias-postgrados/tecnologia-construccion-y-medio-ambiente/maestria-en-ciberseguridad/" target="_blank" rel="noopener noreferrer">
+                                UMECIT <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                            <p>Fundamentos avanzados de seguridad informática, análisis de vulnerabilidades y protección de infraestructura.</p>
+                            <div class="tags mt">
+                                <span class="tag">Seguridad Informática</span>
+                                <span class="tag">Vulnerabilidades</span>
+                                <span class="tag">Infraestructura</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edu-item card-hover">
+                        <div class="edu-icon-col">
+                            <div class="edu-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                        </div>
+                        <div class="edu-body">
+                            <div class="edu-meta-row">
+                                <span class="edu-badge">Licenciatura</span>
+                                <span class="edu-date mono">2019 – 2021</span>
+                            </div>
+                            <h3>Licenciatura en Informática con Énfasis en Redes y Telecomunicaciones</h3>
+                            <a class="edu-inst" href="https://www.oteima.ac.pa/programas/licenciaturas/licenciatura-en-informatica-con-enfasis-en-redes-y-telecomunicaciones/" target="_blank" rel="noopener noreferrer">
+                                Universidad Tecnológica OTEIMA <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                            <p>Fundamentos de redes, protocolos, hardware, sistemas operativos y soporte a usuarios.</p>
+                            <div class="tags mt">
+                                <span class="tag">Networking</span>
+                                <span class="tag">TCP/IP</span>
+                                <span class="tag">Linux</span>
+                                <span class="tag">Windows Server</span>
+                                <span class="tag">Hardware</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── 04 PROYECTOS ── -->
+            <section id="lab-projects">
+                <div class="section-header">
+                    <span class="section-tag mono">_projects</span>
+                    <h2>Proyectos</h2>
+                    <div class="header-line"></div>
+                </div>
+
+                <p class="section-intro">Infraestructura y herramientas construidas desde cero en entorno propio. No simuladores — hardware real, problemas reales.</p>
+
+                <div class="up-grid">
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-server"></i></div>
+                        <div class="up-card-body">
+                            <h3>Home Lab · Wazuh SIEM</h3>
+                            <ul>
+                                <li>Despliegue de Wazuh completo (Manager + Indexer + Dashboard + Filebeat) en dos laptops físicas con recursos limitados</li>
+                                <li>Ubuntu Server en laptop secundaria administrado via SSH — sin teclado ni pantalla físicos</li>
+                                <li>Ataques reales con Kali Linux detectados y correlacionados con MITRE ATT&CK en tiempo real</li>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">Wazuh</span>
+                                <span class="tag">SIEM</span>
+                                <span class="tag">Ubuntu Server</span>
+                                <span class="tag">Kali Linux</span>
+                                <span class="tag">MITRE ATT&CK</span>
+                                <span class="tag">SSH</span>
+                            </div>
+                            <div class="up-links">
+                                <a href="case-files/home-lab-wazuh.html">Ver documentación <i class="fas fa-arrow-right fa-xs"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-robot"></i></div>
+                        <div class="up-card-body">
+                            <h3>SOAR Automation · n8n + IA</h3>
+                            <ul>
+                                <li>Pipeline completo de análisis automático de logs — de Slack a reporte en segundos</li>
+                                <li>Gemini 2.0 como extractor de IOCs agnóstico al formato del log (Wazuh, LetsDefend, Palo Alto)</li>
+                                <li>Enriquecimiento automático con AbuseIPDB y VirusTotal + mapeo MITRE ATT&CK</li>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">n8n</span>
+                                <span class="tag">SOAR</span>
+                                <span class="tag">Gemini 2.0</span>
+                                <span class="tag">AbuseIPDB</span>
+                                <span class="tag">VirusTotal</span>
+                                <span class="tag">Slack</span>
+                            </div>
+                            <div class="up-links">
+                                <a href="case-files/home-lab-soar-n8n.html">Ver documentación <i class="fas fa-arrow-right fa-xs"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fab fa-aws"></i></div>
+                        <div class="up-card-body">
+                            <h3>Cloud &amp; Logging Labs · AWS</h3>
+                            <ul>
+                                <li>IAM: usuarios, roles y permisos con principio de mínimo privilegio</li>
+                                <li>CloudTrail: trazabilidad de acciones y auditoría básica de eventos</li>
+                                <li>Documentación paso a paso sin exposición de credenciales</li>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">AWS</span>
+                                <span class="tag">IAM</span>
+                                <span class="tag">CloudTrail</span>
+                                <span class="tag">Logging</span>
+                            </div>
+                            <div class="up-links">
+                                <a href="case-files/aws-labs.html">Ver AWS Labs <i class="fas fa-arrow-right fa-xs"></i></a>
+                                <a href="https://github.com/Jcorrales02/Cibersecurity-portafolio/tree/main/AWS-Labs" target="_blank" rel="noopener">GitHub <i class="fab fa-github fa-xs"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── 05 SOC CASE FILES ── -->
+            <section id="projects">
+                <div class="section-header">
+                    <span class="section-tag mono">_case_files</span>
+                    <h2>SOC Case Files</h2>
+                    <div class="header-line"></div>
+                </div>
+
+                <p class="section-intro">Casos documentados como evidencia práctica de análisis, triage y reporting. Entornos reales y simulados.</p>
+
+                <div class="sev-filters">
+                    <button class="sev-filter active" data-sev="all">Todos</button>
+                    <button class="sev-filter" data-sev="critical"><span class="sev-dot sev-critical"></span>Crítico</button>
+                    <button class="sev-filter" data-sev="high"><span class="sev-dot sev-high"></span>Alto</button>
+                    <button class="sev-filter" data-sev="medium"><span class="sev-dot sev-medium"></span>Medio</button>
+                    <button class="sev-filter" data-sev="low"><span class="sev-dot sev-low"></span>Bajo</button>
+                </div>
+
+                <div class="case-tabs">
+                    <button class="case-tab active" data-tab="homelab">
+                        <img src="img/home-lab.webp" alt="Home Lab" class="tab-icon-img"> Home Lab
+                    </button>
+                    <button class="case-tab" data-tab="letsdefend">
+                        <img src="img/letsdefend-logo.webp" alt="LetsDefend" class="tab-icon-img"> LetsDefend
+                    </button>
+                    <button class="case-tab" data-tab="cyberdefenders">
+                        <img src="img/cyberdefenders-logo.webp" alt="CyberDefenders" class="tab-icon-img"> CyberDefenders
+                    </button>
+                </div>
+
+                <!-- HOME LAB CASES -->
+                <div class="case-panel active" id="panel-homelab">
+                    <div class="case-grid">
+
+                        <article class="case-card card-hover" data-sev="high">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">CASE-001</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-high">Alto</span>
+                                </div>
+                                <h3>Brute Force SSH — Detección con Wazuh</h3>
+                            </div>
+                            <p>Ataque de fuerza bruta SSH generado con Hydra desde Kali Linux. 1.183 intentos fallidos en 2m 40s, mapeados a MITRE ATT&CK T1110. Análisis de patrón, escalada de severidad y recomendaciones de contención.</p>
+                            <div class="tags">
+                                <span class="tag">Brute Force</span>
+                                <span class="tag">SSH</span>
+                                <span class="tag">Wazuh</span>
+                                <span class="tag">MITRE T1110</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-002-bruteforce.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover case-upcoming" data-sev="all">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">CASE-002</span>
+                                    <span class="case-status status-next">Próximo</span>
+                                </div>
+                                <h3>En desarrollo…</h3>
+                            </div>
+                            <p>Próximo caso del home lab — escenario de ataque completo con acceso inicial, escalada y C2.</p>
+                            <div class="tags">
+                                <span class="tag">Coming soon</span>
+                            </div>
+                            <span class="case-link dim">Reporte en preparación…</span>
+                        </article>
+
+                    </div>
+                </div>
+
+                <!-- LETSDEFEND CASES -->
+                <div class="case-panel" id="panel-letsdefend">
+                    <div class="case-grid">
+
+                        <article class="case-card card-hover" data-sev="critical">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC336</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-critical">Crítico</span>
+                                </div>
+                                <h3>CVE-2025-21298 — OLE RCE via Phishing RTF</h3>
+                            </div>
+                            <p>Explotación zero-click en Windows OLE via adjunto RTF. Cadena OUTLOOK.EXE → cmd.exe → regsvr32.exe confirmó RCE. Técnica Squiblydoo con conexión C2 activa.</p>
+                            <div class="tags">
+                                <span class="tag">Phishing</span>
+                                <span class="tag">RCE</span>
+                                <span class="tag">LOLBIN</span>
+                                <span class="tag">CVE-2025-21298</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-006-ole-rce.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover" data-sev="critical">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC342</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-critical">Crítico</span>
+                                </div>
+                                <h3>CVE-2025-53770 ToolShell — SharePoint RCE</h3>
+                            </div>
+                            <p>Zero-day crítico en SharePoint Server. Auth bypass + RCE confirmado. Extracción de MachineKeys, compilación de payload con csc.exe y webshell persistente desplegada.</p>
+                            <div class="tags">
+                                <span class="tag">SharePoint</span>
+                                <span class="tag">WebShell</span>
+                                <span class="tag">CVE-2025-53770</span>
+                                <span class="tag">Critical</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-004-sharepoint-toolshell.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover" data-sev="medium">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC153</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-medium">Medio</span>
+                                </div>
+                                <h3>PowerShell Malicioso — KOI-STEALER</h3>
+                            </div>
+                            <p>Script PowerShell con ExecutionPolicy Bypass descargado y ejecutado en endpoint Windows. Comunicación C2 con kionagranada.com confirmada via Sysmon EventID 22. Infostealer activo.</p>
+                            <div class="tags">
+                                <span class="tag">PowerShell</span>
+                                <span class="tag">Infostealer</span>
+                                <span class="tag">C2</span>
+                                <span class="tag">T1059.001</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-003-powershell-koi.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover" data-sev="medium">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC127</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-medium">Medio</span>
+                                </div>
+                                <h3>SQL Injection + XSS + RCE Automatizado</h3>
+                            </div>
+                            <p>Payload automatizado combinando SQLi, XSS y xp_cmdshell contra servidor web interno. HTTP 200 con impacto indeterminado por falta de acceso a logs del endpoint.</p>
+                            <div class="tags">
+                                <span class="tag">SQLi</span>
+                                <span class="tag">XSS</span>
+                                <span class="tag">Web Attack</span>
+                                <span class="tag">T1190</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-005-sqli.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover" data-sev="critical">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC-335</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-critical">Crítico</span>
+                                </div>
+                                <h3>Brute Force + CVE-2024-49138 Privilege Escalation</h3>
+                            </div>
+                            <p>Fuerza bruta exitosa contra cuenta Windows (4625→4624). Malware svohost.exe con masquerading de svchost.exe descargado via PowerShell. Reconocimiento post-compromiso con whoami.</p>
+                            <div class="tags">
+                                <span class="tag">Brute Force</span>
+                                <span class="tag">Masquerading</span>
+                                <span class="tag">CVE-2024-49138</span>
+                                <span class="tag">True Positive</span>
+                            </div>
+                            <a href="case-files/case-007-bruteforce-malware.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover case-upcoming" data-sev="all">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">SOC-X</span>
+                                    <span class="case-status status-next">Próximo</span>
+                                </div>
+                                <h3>En desarrollo…</h3>
+                            </div>
+                            <p>Próximo caso de LetsDefend en análisis.</p>
+                            <div class="tags">
+                                <span class="tag">Coming soon</span>
+                            </div>
+                            <span class="case-link dim">Reporte en preparación…</span>
+                        </article>
+
+                    </div>
+                </div>
+
+                <!-- CYBERDEFENDERS CASES -->
+                <div class="case-panel" id="panel-cyberdefenders">
+                    <div class="case-grid">
+
+                        <article class="case-card card-hover" data-sev="medium">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">CD-01</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-medium">Medio</span>
+                                </div>
+                                <h3>Tomcat Takeover — Análisis PCAP</h3>
+                            </div>
+                            <p>Análisis de tráfico de red de ataque completo contra Apache Tomcat. Escaneo, Gobuster, fuerza bruta con credenciales por defecto y webshell WAR con reverse shell hacia C2 en China.</p>
+                            <div class="tags">
+                                <span class="tag">PCAP</span>
+                                <span class="tag">Wireshark</span>
+                                <span class="tag">Apache Tomcat</span>
+                                <span class="tag">WebShell</span>
+                                <span class="tag">Reverse Shell</span>
+                            </div>
+                            <a href="case-files/case-cd01-tomcat-takeover.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover case-upcoming" data-sev="all">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">CD-02</span>
+                                    <span class="case-status status-next">Próximo</span>
+                                </div>
+                                <h3>En desarrollo…</h3>
+                            </div>
+                            <p>Próximo lab de CyberDefenders en análisis.</p>
+                            <div class="tags">
+                                <span class="tag">Coming soon</span>
+                            </div>
+                            <span class="case-link dim">Reporte en preparación…</span>
+                        </article>
+
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ── 06 FORMACIÓN ── -->
+            <section id="upskilling">
+                <div class="section-header">
+                    <span class="section-tag mono">_upskilling</span>
+                    <h2>Formación</h2>
+                    <div class="header-line"></div>
+                </div>
+
+                <div class="up-grid">
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-flask"></i></div>
+                        <div class="up-card-body">
+                            <h3>Plataformas de práctica</h3>
+                            <ul>
+                                <li>TryHackMe — rutas y laboratorios orientados a SOC: triage, investigación, reporting</li>
+                                <li>LetsDefend — análisis de alertas reales en entorno SOC simulado</li>
+                                <li>CyberDefenders — análisis forense y PCAP en escenarios blue team</li>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">TryHackMe</span>
+                                <span class="tag">LetsDefend</span>
+                                <span class="tag">CyberDefenders</span>
+                                <span class="tag">Blue Team</span>
+                            </div>
+                            <div class="up-links">
+                                <a href="https://tryhackme.com/p/jose002" target="_blank" rel="noopener">TryHackMe <i class="fas fa-terminal fa-xs"></i></a>
+                                <a href="https://github.com/jcorrales02" target="_blank" rel="noopener">GitHub <i class="fab fa-github fa-xs"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="up-card-body">
+                            <h3>Cursos completados</h3>
+                            <ul>
+                                <li>Udemy — Curso Hacking Ético y Ciberseguridad (Basico y Avanzada)</li>
+                                    <div class="up-links">
+                                        <a href="https://www.udemy.com/certificate/UC-a62898c3-d6c3-48b6-b6eb-e975e2449a05/">Ver Certificado <i class="fas fa-arrow-right fa-xs"></i></a>
+                                        <a href="https://www.udemy.com/certificate/UC-428b0dc2-5da0-4f13-a276-443501917025/">Ver Certificado <i class="fas fa-arrow-right fa-xs"></i></a>
+                                    </div>   
+                                    <li>Udemy — Curso completo de Ciberseguridad Defensiva</li>
+                                    <div class="up-links">
+                                        <a href="https://www.udemy.com/certificate/UC-705a750d-90f6-46a4-8ca6-a82b8cfc22ab/">Ver Certificado <i class="fas fa-arrow-right fa-xs"></i></a>
+                                    </div>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">Pentesting</span>
+                                <span class="tag">Blue Team</span>
+                                <span class="tag">Fundamentos</span>
+                                <span class="tag">Udemy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-spinner fa-spin-pulse"></i></div>
+                        <div class="up-card-body">
+                            <h3>En curso / Preparación</h3>
+                            <ul>
+                                <li>Practica Continua de Wireshark — <strong>Preparación activa</strong></li>
+                                <li>Documentación de Laboratorios en linea y en el Home Lab — <em>En curso</em></li>
+                            </ul>
+                            <p class="note">Estudio diario + simulacros semanales. Documentación de progreso y notas.</p>
+                            <div class="tags mt">
+                                <span class="tag">Wireshark</span>
+                                <span class="tag">Home Lab</span>
+                                <span class="tag">Documentación de Incidentes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="up-card card-hover cert-target">
+                        <div class="up-card-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="up-card-body">
+                            <h3>Certificaciones objetivo</h3>
+                            <ul>
+                                <li><span class="cert-pill">Security Analyst Level 1 (SAL1)</span> — Corto plazo</li>
+                                <li><span class="cert-pill dim-pill">CompTIA Security+</span> — Mediano - Largo Plazo</li>
+                            </ul>
+                            <!-- <p class="note">Respaldadas en evidencias prácticas: rooms TryHackMe + lab AWS.</p> -->
+                            <div class="tags mt">
+                                <span class="tag">Certificación</span>
+                                <span class="tag">TryHackMe</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ── 07 CONTACT ── -->
+            <section id="contact">
+                <div class="section-header">
+                    <span class="section-tag mono">_contact</span>
+                    <h2>Contacto</h2>
+                    <div class="header-line"></div>
+                </div>
+                <div class="contact-body">
+                    <p>Estoy abierto a oportunidades profesionales, colaboraciones o intercambios de ideas.</p>
+                    <p>También podés contactarme por <a href="https://www.linkedin.com/in/josecorralesg" target="_blank">LinkedIn <i class="fab fa-linkedin-in fa-xs"></i></a></p>
+                </div>
+            </section>
+
+            <footer>
+                <span class="mono dim">© 2026 José Corrales</span>
+                <span class="dim">·</span>
+                <span class="mono dim">HTML + CSS + JS</span>
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="scroll-nav.js"></script>
+    <script>
+        // Cursor glow
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // Typing effect
+        const statusText = document.querySelector('.status-text');
+        const msg = 'AVAILABLE FOR HIRE';
+        let i = 0;
+        statusText.textContent = '';
+        function type() {
+            if (i < msg.length) {
+                statusText.textContent += msg[i++];
+                setTimeout(type, 80);
+            }
+        }
+        setTimeout(type, 800);
+
+        // Modal logic
+        document.querySelectorAll('.ver-diploma-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = document.getElementById(this.dataset.modal);
+                modal.classList.add('activo');
+                document.body.classList.add('body-sin-scroll');
+            });
+        });
+        document.querySelectorAll('.cerrar-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                modal.classList.remove('activo');
+                document.body.classList.remove('body-sin-scroll');
+            });
+        });
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('activo');
+                document.body.classList.remove('body-sin-scroll');
+            }
+        });
+
+        // Case tabs
+        document.querySelectorAll('.case-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.case-panel').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+                document.querySelectorAll('.sev-filter').forEach(f => f.classList.remove('active'));
+                document.querySelector('.sev-filter[data-sev="all"]').classList.add('active');
+                document.querySelectorAll('.case-card').forEach(c => c.style.display = '');
+            });
+        });
+
+        // Severity filters
+        document.querySelectorAll('.sev-filter').forEach(filter => {
+            filter.addEventListener('click', function() {
+                document.querySelectorAll('.sev-filter').forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+                const sev = this.dataset.sev;
+                const activePanel = document.querySelector('.case-panel.active');
+                activePanel.querySelectorAll('.case-card').forEach(card => {
+                    if (sev === 'all' || card.dataset.sev === sev || card.dataset.sev === 'all') {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Resalta el link de navegación correspondiente a la sección visible
+        const sections = document.querySelectorAll('main section[id]');
+        const navLinks = document.querySelectorAll('.main-nav a');
+        
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('nav-active');
+                        if (link.getAttribute('href') === '#' + entry.target.id) {
+                            link.classList.add('nav-active');
+                        }
+                    });
+                }
+            });
+        }, {
+            rootMargin: '-30% 0px -60% 0px',
+            threshold: 0
+        });
+        
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>

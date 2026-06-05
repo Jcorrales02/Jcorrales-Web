@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE-003 · PowerShell KOI-STEALER — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .case-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 40px;
+            transition: all var(--transition);
+        }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+
+        .case-header { margin-bottom: 40px; }
+
+        .case-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .case-id-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--accent);
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+        }
+
+        .case-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-tp {
+            background: rgba(255, 80, 80, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 80, 80, 0.2);
+        }
+
+        .badge-closed {
+            background: rgba(0, 200, 120, 0.08);
+            color: #00c878;
+            border: 1px solid rgba(0, 200, 120, 0.2);
+        }
+
+        .badge-medium {
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .case-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-bright);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .case-header p.lead {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.75;
+            max-width: 680px;
+        }
+
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 18px 20px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+
+        .info-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.08em;
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-2);
+        }
+
+        .info-value.critical { color: #ff6b6b; }
+        .info-value.confirmed { color: #00c878; }
+        .info-value.medium { color: #ffa500; }
+
+        .case-section { margin-bottom: 48px; }
+
+        .case-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .case-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .case-section p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 14px;
+        }
+
+        .case-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .case-section ul li {
+            font-size: 0.9rem;
+            color: var(--text);
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .case-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.5;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        .evidence-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 20px 0;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .ev-row {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ev-row:last-child { border-bottom: none; }
+
+        .ev-key {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            opacity: 0.7;
+            padding: 10px 16px;
+            min-width: 180px;
+            background: rgba(0,0,0,0.15);
+            border-right: 1px solid var(--border);
+        }
+
+        .ev-val {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-2);
+            padding: 10px 16px;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .ev-val.danger { color: #ff6b6b; }
+        .ev-val.warn { color: #ffa500; }
+
+        .code-block {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            overflow-x: auto;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+        .code-block .danger { color: #ff6b6b; }
+
+        .attack-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .attack-timeline::before {
+            content: '';
+            position: absolute;
+            left: 80px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .tl-item {
+            display: flex;
+            gap: 20px;
+            padding: 16px 0;
+        }
+
+        .tl-time {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text);
+            opacity: 0.5;
+            min-width: 72px;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        .tl-dot-wrap {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 6px;
+        }
+
+        .tl-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .tl-dot.high { background: #ff6b6b; opacity: 0.8; }
+        .tl-dot.warn { background: #ffa500; opacity: 0.8; }
+
+        .tl-content { flex: 1; padding-left: 8px; }
+
+        .tl-content strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-2);
+            margin-bottom: 3px;
+        }
+
+        .tl-content p {
+            font-size: 0.84rem;
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .ioc-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .ioc-card {
+            padding: 14px 18px;
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .ioc-type {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            min-width: 70px;
+            padding-top: 2px;
+            letter-spacing: 0.05em;
+        }
+
+        .ioc-content { flex: 1; }
+
+        .ioc-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #ff6b6b;
+            word-break: break-all;
+            margin-bottom: 3px;
+        }
+
+        .ioc-desc {
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .mitre-block {
+            padding: 20px 24px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            margin: 12px 0;
+        }
+
+        .mitre-block .mitre-id {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .mitre-block .mitre-name {
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mitre-block p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .mitre-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .actions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .action-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .action-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            opacity: 0.5;
+            min-width: 24px;
+            padding-top: 1px;
+        }
+
+        .action-item p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        .action-item strong { color: var(--text-2); }
+
+        .verdict-block {
+            padding: 24px;
+            background: rgba(255, 107, 107, 0.04);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        .verdict-block .verdict-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: #ff6b6b;
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .verdict-block p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .lesson {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+        }
+
+        .lesson p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .lesson strong { color: var(--accent); }
+
+        .note-block {
+            padding: 14px 18px;
+            background: rgba(255, 165, 0, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: var(--radius);
+            margin: 16px 0;
+            font-size: 0.86rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .note-block strong { color: #ffa500; }
+
+        @media (min-width: 600px) {
+            .lessons-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="case-page">
+
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <header class="case-header">
+            <div class="case-meta-row">
+                <span class="case-id-label mono">// CASE-002 · SOC153</span>
+                <span class="case-badge badge-tp">True Positive</span>
+                <span class="case-badge badge-closed">Cerrado</span>
+                <span class="case-badge badge-medium">Medium</span>
+            </div>
+            <h1>PowerShell Malicioso —<br>KOI-STEALER via Script Descargado</h1>
+            <p class="lead">
+                Ejecución de script PowerShell malicioso en endpoint Windows 10 tras descarga desde URL externa. 
+                El análisis confirmó conexión activa con infraestructura C2 asociada al infostealer KOI-STEALER, 
+                capaz de robar credenciales, cookies y datos del navegador.
+            </p>
+        </header>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// fecha</span>
+                <span class="info-value">14 Mar 2024 · 05:23 PM</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// severidad</span>
+                <span class="info-value medium">Media</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// fuente</span>
+                <span class="info-value">LetsDefend · SOC153</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// clasificación</span>
+                <span class="info-value confirmed">True Positive</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// malware</span>
+                <span class="info-value critical">KOI-STEALER</span>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="case-section">
+            <p class="case-section-title">// 01_resumen</p>
+            <h2>Resumen ejecutivo</h2>
+            <p>
+                El EDR detectó la ejecución de <strong>payload_1.ps1</strong> en el endpoint 
+                <strong>Tony (172.16.17.206)</strong>, un script PowerShell descargado desde una URL 
+                externa. El análisis del hash en VirusTotal confirmó detección maliciosa por 34 de 62 
+                motores, y el análisis de logs de red reveló comunicación activa con el dominio 
+                <strong>kionagranada.com</strong> (161.22.46.148), infraestructura C2 asociada al 
+                infostealer <strong>KOI-STEALER</strong>.
+            </p>
+            <p>
+                El script fue ejecutado con bypass de política de ejecución, técnica común para evadir 
+                controles de seguridad en Windows. El endpoint fue aislado de la red para contener 
+                posible exfiltración de credenciales y datos del navegador.
+            </p>
+
+            <div class="verdict-block">
+                <p class="verdict-label">// veredicto</p>
+                <p>
+                    <strong>True Positive confirmado.</strong> Ejecución de infostealer KOI-STEALER con 
+                    comunicación C2 activa. Endpoint Tony aislado. Se recomienda análisis forense completo 
+                    del sistema, reseteo de credenciales del usuario afectado y revisión de otros endpoints 
+                    en el mismo segmento de red.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidencia -->
+        <div class="case-section">
+            <p class="case-section-title">// 02_evidencia</p>
+            <h2>Evidencia técnica</h2>
+
+            <div class="evidence-grid">
+                <div class="ev-row">
+                    <span class="ev-key">Hostname</span>
+                    <span class="ev-val">Tony</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP endpoint</span>
+                    <span class="ev-val">172.16.17.206</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Sistema operativo</span>
+                    <span class="ev-val">Windows 10</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Archivo malicioso</span>
+                    <span class="ev-val danger">payload_1.ps1</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Ruta</span>
+                    <span class="ev-val">C:\Users\LetsDefend\Downloads\payload_1.ps1</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Hash (SHA256)</span>
+                    <span class="ev-val danger">db8be06ba6d2d3595dd0c86654a48cfc4c0c5408fdd3f4e1eaf342ac7a2479d0</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">VirusTotal</span>
+                    <span class="ev-val danger">34/62 motores — Malicioso</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">URL de descarga</span>
+                    <span class="ev-val danger">https://files-ld.s3.us-east-2.amazonaws.com/payload_1.ps1</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Dominio C2</span>
+                    <span class="ev-val danger">kionagranada.com</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP C2</span>
+                    <span class="ev-val danger">161.22.46.148</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Familia malware</span>
+                    <span class="ev-val danger">KOI-STEALER (Infostealer)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Acción EDR</span>
+                    <span class="ev-val warn">Detected (no bloqueado)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comando ejecutado -->
+        <div class="case-section">
+            <p class="case-section-title">// 03_comando</p>
+            <h2>Comando malicioso ejecutado</h2>
+            <p>
+                El log del endpoint reveló la siguiente línea de ejecución, confirmando que el script 
+                fue ejecutado con bypass deliberado de la política de ejecución de PowerShell:
+            </p>
+
+            <div class="code-block">
+                <span class="comment"># Proceso padre: PowerShell.exe</span><br>
+                "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"<br>
+                "<span class="danger">-Command</span>"<br>
+                "if((Get-ExecutionPolicy) -ne 'AllSigned') {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="danger">Set-ExecutionPolicy -Scope Process Bypass</span><br>
+                };<br>
+                &amp; 'C:\Users\LetsDefend\Downloads\payload_1.ps1\<span class="danger">payload_1.ps1</span>'"
+            </div>
+
+            <p>
+                El uso de <strong>Set-ExecutionPolicy -Scope Process Bypass</strong> es una técnica 
+                de evasión clásica (MITRE T1059.001) que permite ejecutar scripts sin restricciones 
+                en el proceso actual, evitando los controles de política configurados en el sistema.
+            </p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="case-section">
+            <p class="case-section-title">// 04_timeline</p>
+            <h2>Línea de tiempo del incidente</h2>
+
+            <div class="attack-timeline">
+                <div class="tl-item">
+                    <span class="tl-time">Previo</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Descarga del script malicioso</strong>
+                        <p>El usuario descarga payload_1.ps1 desde una URL en S3 de AWS. El historial del navegador confirma la descarga. El archivo queda en C:\Users\LetsDefend\Downloads\.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">05:23 PM</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Ejecución del script con bypass</strong>
+                        <p>PowerShell ejecuta payload_1.ps1 con política de ejecución en Bypass. El EDR detecta la actividad y genera alerta SOC153. No bloquea la ejecución.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">05:23 PM</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Comunicación con C2 — kionagranada.com</strong>
+                        <p>Sysmon EventID 22 (DNS Query) registra resolución de kionagranada.com → 161.22.46.148 por parte de PowerShell. Se establece comunicación con infraestructura KOI-STEALER.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Post</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Aislamiento del endpoint</strong>
+                        <p>Confirmado True Positive. Endpoint Tony aislado de la red para contener posible exfiltración de credenciales y datos del navegador.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IOCs -->
+        <div class="case-section">
+            <p class="case-section-title">// 05_iocs</p>
+            <h2>Indicadores de compromiso (IOCs)</h2>
+
+            <div class="ioc-grid">
+                <div class="ioc-card">
+                    <span class="ioc-type">SHA256</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">db8be06ba6d2d3595dd0c86654a48cfc4c0c5408fdd3f4e1eaf342ac7a2479d0</div>
+                        <div class="ioc-desc">payload_1.ps1 — 34/62 VirusTotal · KOI-STEALER</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">DOMINIO</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">kionagranada.com</div>
+                        <div class="ioc-desc">C2 KOI-STEALER — clasificado como Malware en VirusTotal</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">IP</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">161.22.46.148</div>
+                        <div class="ioc-desc">Resolución de kionagranada.com — sin historial previo en VirusTotal</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">URL</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">https://files-ld.s3.us-east-2.amazonaws.com/payload_1.ps1</div>
+                        <div class="ioc-desc">URL de descarga del script malicioso</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MITRE -->
+        <div class="case-section">
+            <p class="case-section-title">// 06_mitre</p>
+            <h2>Mapeo MITRE ATT&CK</h2>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1059.001 — PowerShell</div>
+                <div class="mitre-name">Táctica: Execution</div>
+                <p>Uso de PowerShell con bypass de política de ejecución para correr un script malicioso sin restricciones. Técnica ampliamente usada por actores de amenaza para ejecutar payloads evadiendo controles básicos de Windows.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1059.001</span>
+                    <span class="tag">Execution</span>
+                    <span class="tag">TA0002</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1105 — Ingress Tool Transfer</div>
+                <div class="mitre-name">Táctica: Command and Control</div>
+                <p>Descarga del script malicioso desde una URL externa controlada por el atacante hacia el endpoint víctima, previo a su ejecución.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1105</span>
+                    <span class="tag">Command and Control</span>
+                    <span class="tag">TA0011</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1071.001 — Web Protocols</div>
+                <div class="mitre-name">Táctica: Command and Control</div>
+                <p>Comunicación del malware con el C2 kionagranada.com usando protocolos web estándar, dificultando la detección por firewalls básicos que permiten tráfico HTTP/HTTPS saliente.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1071.001</span>
+                    <span class="tag">C2</span>
+                    <span class="tag">TA0011</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1555 — Credentials from Password Stores</div>
+                <div class="mitre-name">Táctica: Credential Access</div>
+                <p>KOI-STEALER tiene capacidad documentada de robar credenciales almacenadas en navegadores y gestores de contraseñas del sistema comprometido.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1555</span>
+                    <span class="tag">Credential Access</span>
+                    <span class="tag">TA0006</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 07_acciones</p>
+            <h2>Acciones tomadas</h2>
+
+            <div class="actions-list">
+                <div class="action-item">
+                    <span class="action-num">01</span>
+                    <p><strong>Verificación del hash:</strong> SHA256 del archivo consultado en VirusTotal — 34/62 motores lo detectan como malicioso. La threat intel interna no tenía registro previo.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">02</span>
+                    <p><strong>Análisis del comando ejecutado:</strong> Identificado uso de ExecutionPolicy Bypass en PowerShell, técnica de evasión deliberada (T1059.001). Confirmada ejecución del script descargado.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">03</span>
+                    <p><strong>Investigación de tráfico de red:</strong> Revisión de logs Sysmon EventID 22 — DNS Query reveló resolución de kionagranada.com por parte de PowerShell, confirmando comunicación C2 activa.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">04</span>
+                    <p><strong>Verificación de propagación:</strong> Revisión del segmento de red — solo el endpoint Tony (172.16.17.206) presentó actividad relacionada. No se detectó movimiento lateral.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">05</span>
+                    <p><strong>Aislamiento del endpoint:</strong> Tony aislado de la red para contener posible exfiltración en curso de credenciales y datos del navegador por KOI-STEALER.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">06</span>
+                    <p><strong>Clasificación y escalamiento:</strong> True Positive confirmado. Caso escalado para análisis forense completo y reseteo de credenciales del usuario afectado.</p>
+                </div>
+            </div>
+
+            <div class="note-block">
+                <strong>Nota de análisis:</strong> La conexión C2 fue inicialmente no reportada al no estar explícita en el comando de ejecución. Fue identificada posteriormente mediante correlación con logs Sysmon (EventID 22), confirmando que el análisis de red es indispensable para casos de malware — el comando por sí solo no revela toda la actividad.
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 08_recomendaciones</p>
+            <h2>Recomendaciones</h2>
+            <ul>
+                <li>Resetear <strong>todas las credenciales</strong> del usuario Tony — KOI-STEALER tiene capacidad de robar contraseñas del navegador y gestores de contraseñas</li>
+                <li>Realizar <strong>análisis forense completo</strong> del endpoint para determinar qué datos fueron exfiltrados durante el tiempo activo del malware</li>
+                <li>Bloquear en firewall las IPs y dominios IOC: <strong>kionagranada.com</strong> y <strong>161.22.46.148</strong></li>
+                <li>Implementar política de <strong>restricción de PowerShell</strong> (Constrained Language Mode) para usuarios no administrativos</li>
+                <li>Configurar <strong>AppLocker o WDAC</strong> para bloquear ejecución de scripts desde la carpeta Downloads</li>
+                <li>Revisar si otros endpoints descargaron archivos desde la misma URL de S3</li>
+                <li>Habilitar <strong>Script Block Logging</strong> en PowerShell para capturar contenido de scripts en el futuro</li>
+            </ul>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 09_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>El comando no cuenta toda la historia.</strong> La ejecución del script no revelaba directamente la conexión C2. Solo el análisis de logs de red (Sysmon EventID 22) confirmó la comunicación con kionagranada.com. El análisis de red es obligatorio en casos de malware.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>ExecutionPolicy Bypass es una señal de alerta inmediata.</strong> Cualquier proceso que use Set-ExecutionPolicy -Scope Process Bypass debe tratarse como sospechoso por defecto — es una técnica de evasión deliberada.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>La threat intel interna tiene límites.</strong> El hash no aparecía en la base interna de LetsDefend pero sí en VirusTotal con 34 detecciones. Siempre consultar fuentes externas cuando la intel interna no arroja resultados.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>KOI-STEALER exige respuesta urgente.</strong> Un infostealer activo con C2 establecido significa que las credenciales pueden estar siendo exfiltradas en tiempo real. El aislamiento inmediato no es opcional.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">CASE-002 · SOC153 · KOI-STEALER</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

