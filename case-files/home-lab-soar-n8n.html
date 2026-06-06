@@ -263,9 +263,103 @@
             </div>
         </div>
 
+        <!-- Conectividad -->
+            <div class="lab-section">
+                <p class="lab-section-title">// 04_conectividad</p>
+                <h2>Desafío de conectividad</h2>
+
+                <p>
+                    Durante la implementación surgió un problema importante: la instancia de n8n se ejecutaba
+                    localmente dentro del Home Lab utilizando una dirección localhost. Aunque el flujo funcionaba
+                    correctamente dentro del entorno local, Slack no podía comunicarse con el webhook de n8n
+                    porque no existía una dirección pública accesible desde Internet.
+                </p>
+
+                <p>
+                    Para resolver este problema se utilizó ngrok, una herramienta que crea un túnel seguro entre
+                    Internet y un servicio local. Esto permitió exponer temporalmente el webhook de n8n mediante
+                    una URL pública y recibir eventos directamente desde Slack sin necesidad de desplegar la
+                    plataforma en la nube.
+                </p>
+
+                <div class="flow-diagram">
+
+                    <div class="flow-node">
+                        <span class="flow-box flow-trigger">Slack</span>
+                        <span class="flow-dim">// origen de los eventos</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-arrow">↓</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-box flow-api">ngrok</span>
+                        <span class="flow-dim">// túnel seguro hacia el Home Lab</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-arrow">↓</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-box flow-code">Webhook n8n</span>
+                        <span class="flow-dim">// endpoint expuesto públicamente</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-arrow">↓</span>
+                    </div>
+
+                    <div class="flow-node">
+                        <span class="flow-box flow-output">Workflow SOAR</span>
+                        <span class="flow-dim">// ejecución del análisis automatizado</span>
+                    </div>
+
+                </div>
+
+                <div class="results-grid">
+
+                    <div class="result-card">
+                        <h4>// problema</h4>
+                        <ul>
+                            <li>n8n solo era accesible mediante localhost</li>
+                            <li>Slack no podía alcanzar el webhook local</li>
+                            <li>No existía una dirección pública para recibir eventos</li>
+                        </ul>
+                    </div>
+
+                    <div class="result-card">
+                        <h4>// solución</h4>
+                        <ul>
+                            <li>Implementación de un túnel seguro con ngrok</li>
+                            <li>Exposición temporal del webhook a Internet</li>
+                            <li>Comunicación bidireccional funcional con Slack</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- SCREENSHOT OPCIONAL -->
+                <div class="screenshot-block">
+                    <div class="screenshot-placeholder">
+                        <img
+                            src="../img/home-lab-ngrok.png"
+                            alt="Configuración de ngrok utilizada para exponer el webhook de n8n"
+                            style="width: 100%; display: block;"
+                        >
+                    </div>
+                    <div class="screenshot-caption">
+                        <i class="fas fa-image fa-xs"></i>
+                        &nbsp;ngrok proporcionando acceso público al webhook local de n8n
+                    </div>
+                </div>
+
+            </div>
+
         <!-- Componentes -->
         <div class="lab-section">
-            <p class="lab-section-title">// 04_componentes</p>
+            <p class="lab-section-title">// 05_componentes</p>
             <h2>Componentes detallados</h2>
 
             <div class="components">
@@ -297,13 +391,14 @@
 Devuelve ÚNICAMENTE un objeto JSON válido, sin explicaciones, sin markdown, sin bloques de código.
 
 {
-  "ips": [], "ip_origen": null, "ip_destino": null,
-  "dominios": [], "urls": [], "hashes": [],
-  "archivos": [], "cves": [], "comandos": [],
-  "usuarios": [], "puertos": [], "hostname": null, "raw_log": ""
+"ips": [], "ip_origen": null, "ip_destino": null,
+"dominios": [], "urls": [], "hashes": [],
+"archivos": [], "cves": [], "comandos": [],
+"usuarios": [], "puertos": [], "hostname": null, "raw_log": ""
 }
 
-LOG A ANALIZAR: {{ $json.text }}</div>
+LOG A ANALIZAR: {{ $json.text }}
+                        </div>
 
                         <!-- SCREENSHOT 2 -->
                         <div class="screenshot-block">
@@ -332,23 +427,23 @@ LOG A ANALIZAR: {{ $json.text }}</div>
                         <p>Parsea el JSON de Gemini y estructura los datos para el resto del flujo. Agrega flags <code>_tiene</code> para indicar qué IOCs están presentes y evitar errores en nodos posteriores cuando algún IOC no existe.</p>
 
                         <div class="code-block">
-<span class="comment">// Fragmento clave — parseo seguro del JSON de Gemini</span>
-<span class="key">const</span> <span class="val">item</span> = $input.first();
-<span class="key">const</span> <span class="val">rawText</span> = item.json.content?.parts?.[0]?.text || <span class="str">""</span>;
+                            <span class="comment">// Fragmento clave — parseo seguro del JSON de Gemini</span>
+                            <span class="key">const</span> <span class="val">item</span> = $input.first();
+                            <span class="key">const</span> <span class="val">rawText</span> = item.json.content?.parts?.[0]?.text || <span class="str">""</span>;
 
-<span class="key">let</span> <span class="val">iocs</span> = {};
-<span class="key">try</span> {
-  <span class="key">const</span> <span class="val">clean</span> = rawText.replace(<span class="str">/```json|```/g</span>, <span class="str">''</span>).trim();
-  iocs = JSON.parse(clean);
-} <span class="key">catch</span> (e) { iocs = {}; }
+                            <span class="key">let</span> <span class="val">iocs</span> = {};
+                            <span class="key">try</span> {
+                            <span class="key">const</span> <span class="val">clean</span> = rawText.replace(<span class="str">/```json|```/g</span>, <span class="str">''</span>).trim();
+                            iocs = JSON.parse(clean);
+                            } <span class="key">catch</span> (e) { iocs = {}; }
 
-<span class="comment">// Flags de presencia para control de flujo</span>
-_tiene: {
-  ip:      (iocs.ips || []).length > 0,
-  hash:    (iocs.hashes || []).length > 0,
-  archivo: (iocs.archivos || []).length > 0,
-  dominio: (iocs.dominios || []).length > 0
-}</div>
+                <span class="comment">// Flags de presencia para control de flujo</span>
+                _tiene: {
+                ip:      (iocs.ips || []).length > 0,
+                hash:    (iocs.hashes || []).length > 0,
+                archivo: (iocs.archivos || []).length > 0,
+                dominio: (iocs.dominios || []).length > 0
+                }</div>
 
                         <!-- SCREENSHOT 3 -->
                         <div class="screenshot-block">
@@ -490,7 +585,7 @@ Lista de 3 a 5 acciones concretas e inmediatas.</div>
 
         <!-- Resultados -->
         <div class="lab-section">
-            <p class="lab-section-title">// 05_resultados</p>
+            <p class="lab-section-title">// 06_resultados</p>
             <h2>Resultados obtenidos</h2>
 
             <div class="results-grid">
@@ -520,7 +615,7 @@ Lista de 3 a 5 acciones concretas e inmediatas.</div>
 
         <!-- Lecciones -->
         <div class="lab-section">
-            <p class="lab-section-title">// 06_lecciones</p>
+            <p class="lab-section-title">// 07_lecciones</p>
             <h2>Lecciones aprendidas</h2>
 
             <div class="lessons-grid">
