@@ -418,15 +418,37 @@
                             </a>
                         </article>
 
-                        <article class="case-card card-hover case-upcoming" data-sev="all">
+                        <article class="case-card card-hover" data-sev="critical">
                             <div class="case-card-top">
                                 <div class="case-id-wrap">
                                     <span class="case-id mono">CASE-002</span>
+                                    <span class="case-status status-done">Cerrado</span>
+                                    <span class="case-sev sev-critical">Crítico</span>
+                                </div>
+                                <h3>Windows - SSH Brute Force & Account Lockout  — Fase 1 de 9</h3>
+                            </div>
+                            <p>Ataque de fuerza bruta SSH simulado con Hydra desde Kali Linux contra endpoint Windows 10. Múltiples Event 4625 en 11 segundos, bloqueo de cuenta (Event 4740) detectado por Wazuh. Correlación de IP atacante via canal OpenSSH/Operational. Mapeado a MITRE ATT&CK T1110.001 y T1531.</p>
+                            <div class="tags">
+                                <span class="tag">SSH / Port 22</span>
+                                <span class="tag">Sysmon</span>
+                                <span class="tag">Wazuh</span>
+                                <span class="tag">MITRE T1110</span>
+                                <span class="tag">Windows 10 Home</span>
+                            </div>
+                            <a href="case-files/home-lab-case-w01.html" class="case-link">
+                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                            </a>
+                        </article>
+
+                        <article class="case-card card-hover case-upcoming" data-sev="all">
+                            <div class="case-card-top">
+                                <div class="case-id-wrap">
+                                    <span class="case-id mono">CASE-003</span>
                                     <span class="case-status status-next">Próximo</span>
                                 </div>
                                 <h3>En desarrollo…</h3>
                             </div>
-                            <p>Próximo caso del home lab — escenario de ataque completo con acceso inicial, escalada y C2.</p>
+                            <p>Próximo caso del home lab — Fase 2 de 9 — Creación de usuarios locales en windows y verificar logs generados.</p>
                             <div class="tags">
                                 <span class="tag">Coming soon</span>
                             </div>
@@ -691,7 +713,7 @@
                         <div class="up-card-body">
                             <h3>Certificaciones objetivo</h3>
                             <ul>
-                                <li><span class="cert-pill">Security Analyst Level 1 (SAL1)</span> — Corto plazo</li>
+                                <li><span class="cert-pill">Security Analyst Level 1 (SAL1)</span> — Medicano plazo</li>
                                 <li><span class="cert-pill dim-pill">CompTIA Security+</span> — Mediano - Largo Plazo</li>
                             </ul>
                             <!-- <p class="note">Respaldadas en evidencias prácticas: rooms TryHackMe + lab AWS.</p> -->
