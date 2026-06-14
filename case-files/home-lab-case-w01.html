@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CASE-W01 — SSH Brute Force & Account Lockout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #0a0e14;
+      --surface:   #0f1520;
+      --border:    #1e2d40;
+      --accent:    #00aaff;
+      --accent2:   #ff4444;
+      --accent3:   #00ff88;
+      --text:      #c9d4e0;
+      --text-dim:  #5a6a7e;
+      --mono:      'Share Tech Mono', monospace;
+      --sans:      'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 40px 20px 80px;
+    }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── HEADER ── */
+    .case-header {
+      border-left: 3px solid var(--accent);
+      padding-left: 20px;
+      margin-bottom: 40px;
+    }
+
+    .campaign-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .campaign-tag a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--accent);
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: 26px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .case-id {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* ── BADGES ── */
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0 36px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .badge-high    { background: rgba(255,68,68,0.12);  color: var(--accent2); border: 1px solid rgba(255,68,68,0.3); }
+    .badge-blue    { background: rgba(0,170,255,0.08);  color: var(--accent);  border: 1px solid rgba(0,170,255,0.25); }
+    .badge-green   { background: rgba(0,255,136,0.08);  color: var(--accent3); border: 1px solid rgba(0,255,136,0.25); }
+    .badge-gray    { background: rgba(90,106,126,0.15); color: var(--text-dim);border: 1px solid rgba(90,106,126,0.3); }
+
+    /* ── SECTIONS ── */
+    .section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p {
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    /* ── META GRID ── */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+
+    .meta-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px 16px;
+    }
+
+    .meta-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #fff;
+    }
+
+    /* ── EVIDENCE TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(30,45,64,0.5);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    tbody tr:hover td {
+      background: rgba(0,170,255,0.03);
+    }
+
+    .eid {
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .rule-id {
+      color: var(--accent3);
+    }
+
+    .sev-high   { color: var(--accent2); }
+    .sev-medium { color: #ffaa00; }
+    .sev-low    { color: var(--accent3); }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      bottom: 6px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -25px;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+
+    .tl-item.alert::before { background: var(--accent2); }
+    .tl-item.lockout::before { background: #ffaa00; }
+
+    .tl-time {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 2px;
+    }
+
+    .tl-desc {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .tl-detail {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* ── MITRE TABLE ── */
+    .mitre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .mitre-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px;
+    }
+
+    .mitre-tactic {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .mitre-id {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .mitre-name {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* ── IOC TABLE ── */
+    .ioc-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      background: rgba(0,170,255,0.08);
+      color: var(--accent);
+      border: 1px solid rgba(0,170,255,0.2);
+      margin-right: 4px;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    .code-block .comment { color: var(--text-dim); }
+    .code-block .key     { color: var(--accent); }
+    .code-block .val     { color: var(--accent3); }
+
+    /* ── ALERT BOX ── */
+    .alert-box {
+      background: rgba(255,68,68,0.06);
+      border: 1px solid rgba(255,68,68,0.25);
+      border-left: 3px solid var(--accent2);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .info-box {
+      background: rgba(0,170,255,0.05);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    /* ── EVIDENCE IMAGE ── */
+    .evidence-img {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-top: 12px;
+    }
+
+    .img-caption {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* ── LESSON ── */
+    .lesson-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+
+    .lesson-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(0,170,255,0.08);
+      border: 1px solid rgba(0,170,255,0.2);
+      padding: 2px 8px;
+      border-radius: 2px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    /* ── CAMPAIGN NAV ── */
+    .campaign-nav {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 20px;
+      margin-top: 48px;
+    }
+
+    .campaign-nav-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+
+    .campaign-nav-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-case {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .nav-case.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,170,255,0.06);
+    }
+
+    .nav-case:hover:not(.active) {
+      border-color: rgba(90,106,126,0.6);
+      color: var(--text);
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="case-header">
+    <div class="campaign-tag">
+      Campaña: Windows Endpoint Attack Simulation — Fase 1 de 9 &nbsp;|&nbsp;
+      <a href="index.html">← Volver al portfolio</a>
+    </div>
+    <h1>SSH Brute Force &amp; Account Lockout</h1>
+    <div class="case-id">CASE-W01 &nbsp;·&nbsp; Jun 11, 2026 &nbsp;·&nbsp; Home Lab — Wazuh + Sysmon</div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="badges">
+    <span class="badge badge-high">Severidad: High</span>
+    <span class="badge badge-blue">SSH / Port 22</span>
+    <span class="badge badge-blue">Brute Force</span>
+    <span class="badge badge-green">Resuelto</span>
+    <span class="badge badge-gray">Windows 10 Home</span>
+    <span class="badge badge-gray">Wazuh 4.7.5</span>
+    <span class="badge badge-gray">Sysmon v15.20</span>
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="section">
+    <h2>Resumen del Incidente</h2>
+    <p>
+      Se detectó un ataque de fuerza bruta contra el servicio SSH (puerto 22) del endpoint
+      <strong>DESKTOP-CC2O1S4</strong> (192.168.0.103). El atacante, desde
+      <strong>192.168.0.108</strong> (Kali Linux), lanzó múltiples intentos de autenticación
+      en un lapso de aproximadamente 11 segundos usando la herramienta Hydra con un diccionario
+      de contraseñas. Windows activó la política de bloqueo de cuenta (Event 4740) tras superar
+      el umbral de fallos. Wazuh capturó la secuencia completa: fallos de autenticación (4625),
+      bloqueo de cuenta (4740) y logins exitosos posteriores (4624 Logon Type 3).
+    </p>
+    <p>
+      La correlación de la IP fuente del atacante no fue posible directamente desde los eventos
+      4625 del Security Log, ya que OpenSSH en Windows no popula el campo
+      <em>Dirección de red de origen</em>. La atribución fue confirmada mediante el canal
+      <strong>OpenSSH/Operational</strong> en el Event Viewer de la máquina víctima.
+    </p>
+  </div>
+
+  <!-- META -->
+  <div class="section">
+    <h2>Información del Caso</h2>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Máquina Víctima</div>
+        <div class="meta-value">DESKTOP-CC2O1S4</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">IP Víctima</div>
+        <div class="meta-value">192.168.0.103</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">IP Atacante</div>
+        <div class="meta-value">192.168.0.108 (Kali Linux)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Vector de Ataque</div>
+        <div class="meta-value">SSH — Puerto 22</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Herramienta Usada</div>
+        <div class="meta-value">Hydra (diccionario)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Duración del Ataque</div>
+        <div class="meta-value">~11 segundos</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Usuario Objetivo</div>
+        <div class="meta-value">jose (cuenta local)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Resultado</div>
+        <div class="meta-value">Cuenta bloqueada (4740)</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- EVIDENCIA -->
+  <div class="section">
+    <h2>Tabla de Evidencia</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Event ID</th>
+            <th>Regla Wazuh</th>
+            <th>Nivel</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>20:32:27.869</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — primer bloque de fallos masivos</td>
+          </tr>
+          <tr>
+            <td>20:32:27.883</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos consecutivos (hydra)</td>
+          </tr>
+          <tr>
+            <td>20:32:27.899</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos consecutivos (hydra)</td>
+          </tr>
+          <tr>
+            <td>20:32:27.916</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos consecutivos (hydra)</td>
+          </tr>
+          <tr>
+            <td>20:32:27.931</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos consecutivos (hydra)</td>
+          </tr>
+          <tr>
+            <td>20:32:27.950</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos consecutivos (hydra)</td>
+          </tr>
+          <tr>
+            <td><strong>20:32:28.856</strong></td>
+            <td class="eid" style="color:#ffaa00">4740</td>
+            <td class="rule-id" style="color:#ffaa00">60115</td>
+            <td class="sev-high">9</td>
+            <td><strong>⚠ Cuenta bloqueada — umbral de fallos superado</strong></td>
+          </tr>
+          <tr>
+            <td>20:32:28.868</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — intentos continúan post-lockout</td>
+          </tr>
+          <tr>
+            <td>20:32:36.478</td>
+            <td class="eid" style="color:var(--accent3)">4624</td>
+            <td class="rule-id" style="color:var(--accent3)">60106</td>
+            <td class="sev-low">3</td>
+            <td>Login exitoso — Logon Type 3 (red), usuario jose, via sshd.exe</td>
+          </tr>
+          <tr>
+            <td>20:32:37.299</td>
+            <td class="eid">4625</td>
+            <td class="rule-id">60122</td>
+            <td class="sev-medium">5</td>
+            <td>Logon failure — último intento registrado</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EVIDENCIA VISUAL -->
+  <div class="section">
+    <h2>Evidencia Visual</h2>
+    <img src="/img/home-lab-w01.webp" alt="Ataque de fuerza bruta en curso — Hydra en Kali, tail de Wazuh en Zorin, PowerShell en HP x360" class="evidence-img"/>
+    <div class="img-caption">
+      Fig. 1 — Captura en tiempo real del ataque. Izquierda: Wazuh tail mostrando eventos 4625 en tiempo real.
+      Centro: Hydra corriendo en Kali Linux (192.168.0.108). Derecha: PowerShell en la máquina víctima HP x360 (192.168.0.103).
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- TIMELINE -->
+  <div class="section">
+    <h2>Timeline del Ataque</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-time">20:32:26 — 20:32:27</div>
+        <div class="tl-desc">Sesión SSH legítima activa desde Zorin (192.168.0.105)</div>
+        <div class="tl-detail">4624 Logon Type 3 — usuario jose — proceso sshd.exe</div>
+      </div>
+
+      <div class="tl-item alert">
+        <div class="tl-time">20:32:27.869 — 20:32:28.868</div>
+        <div class="tl-desc">Inicio del ataque de fuerza bruta desde Kali (192.168.0.108)</div>
+        <div class="tl-detail">Múltiples 4625 consecutivos — subStatus 0xC0000064 (usuario no existe) / 0xC000006A (contraseña incorrecta) — Hydra vía SSH puerto 22</div>
+      </div>
+
+      <div class="tl-item lockout">
+        <div class="tl-time">20:32:28.856</div>
+        <div class="tl-desc">Windows activa bloqueo de cuenta — Event 4740</div>
+        <div class="tl-detail">Wazuh regla 60115 nivel 9 — umbral de intentos fallidos superado — cuenta jose bloqueada</div>
+      </div>
+
+      <div class="tl-item alert">
+        <div class="tl-time">20:32:28.868 — 20:32:37.299</div>
+        <div class="tl-desc">Hydra continúa intentos post-lockout</div>
+        <div class="tl-detail">4625 continúan registrándose — atacante no detecta el lockout inmediatamente</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">20:32:36.478</div>
+        <div class="tl-desc">Login exitoso registrado — 4624 Logon Type 3</div>
+        <div class="tl-detail">targetUserName: jose — proceso sshd.exe — sesión SSH preexistente de Zorin (no del atacante)</div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- MITRE -->
+  <div class="section">
+    <h2>MITRE ATT&amp;CK Mapping</h2>
+    <div class="mitre-grid">
+      <div class="mitre-card">
+        <div class="mitre-tactic">Credential Access</div>
+        <div class="mitre-id">T1110.001</div>
+        <div class="mitre-name">Brute Force: Password Guessing</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Initial Access</div>
+        <div class="mitre-id">T1078</div>
+        <div class="mitre-name">Valid Accounts</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1531</div>
+        <div class="mitre-name">Account Access Removal (lockout)</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1046</div>
+        <div class="mitre-name">Network Service Discovery (puerto 22 expuesto)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IOCs -->
+  <div class="section">
+    <h2>Indicadores de Compromiso (IOCs)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Contexto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="ioc-tag">IP</span></td>
+            <td>192.168.0.108</td>
+            <td>IP atacante — Kali Linux — fuente del brute force</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Puerto</span></td>
+            <td>TCP/22</td>
+            <td>Servicio SSH expuesto en la víctima</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Usuario</span></td>
+            <td>jose</td>
+            <td>Cuenta objetivo del ataque — bloqueada tras múltiples fallos</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Proceso</span></td>
+            <td>sshd.exe</td>
+            <td>C:\Windows\System32\OpenSSH\sshd.exe — proceso que gestiona la autenticación</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Status</span></td>
+            <td>0xC000006D</td>
+            <td>Error de autenticación — credenciales inválidas</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">SubStatus</span></td>
+            <td>0xC0000064</td>
+            <td>Usuario no existe en el sistema</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ACCIONES TOMADAS -->
+  <div class="section">
+    <h2>Acciones Tomadas</h2>
+
+    <div class="alert-box">
+      <strong>Detección:</strong> Wazuh generó alertas nivel 5 por múltiples 4625 consecutivos (regla 60122)
+      y alerta nivel 9 por bloqueo de cuenta (regla 60115 — Event 4740).
+    </div>
+
+    <div class="info-box">
+      <strong>Análisis:</strong> Se correlacionaron los eventos 4625, 4740 y 4624 por timestamp
+      para reconstruir la secuencia del ataque. La IP fuente fue confirmada mediante el canal
+      OpenSSH/Operational del Event Viewer en la máquina víctima, ya que el Security Log de Windows
+      no popula el campo <em>Dirección de red de origen</em> en eventos SSH.
+    </div>
+
+    <p>
+      <strong>Contención simulada:</strong> En un entorno de producción se recomendarían las
+      siguientes acciones inmediatas:
+    </p>
+
+    <div class="code-block">
+# Bloquear IP atacante via Windows Firewall
+New-NetFirewallRule -DisplayName "Block Attacker" -Direction Inbound `
+  -RemoteAddress 192.168.0.108 -Action Block
+
+# Desbloquear cuenta tras investigación
+net user jose /active:yes
+
+# Revisar intentos desde OpenSSH Operational log
+Get-WinEvent -LogName "OpenSSH/Operational" | `
+  Where-Object {$_.Message -like "*192.168.0.108*"} | `
+  Format-List TimeCreated, Message
+    </div>
+  </div>
+
+  <!-- LIMITACIONES TÉCNICAS -->
+  <div class="section">
+    <h2>Limitaciones Técnicas Identificadas</h2>
+    <div class="info-box">
+      <strong>OpenSSH en Windows no registra IP fuente en Security Log:</strong> Los eventos
+      4625 generados por OpenSSH no populan el campo <em>Dirección de red de origen</em>,
+      a diferencia de lo que ocurre con autenticación SMB o RDP. La correlación de IP atacante
+      requiere fuentes adicionales: canal OpenSSH/Operational, logs de firewall perimetral,
+      o NetFlow. Este es el comportamiento real del sistema, no una limitación del lab.
+    </div>
+  </div>
+
+  <!-- LECCIONES APRENDIDAS -->
+  <div class="section">
+    <h2>Lecciones Aprendidas</h2>
+
+    <div class="lesson-item">
+      <span class="lesson-num">01</span>
+      <span>Un volumen alto de Event 4625 en un rango de segundos es el indicador primario de brute force, independientemente de si la IP fuente es visible en el log.</span>
+    </div>
+
+    <div class="lesson-item">
+      <span class="lesson-num">02</span>
+      <span>El Event 4740 (account lockout) es una señal de alta confianza — confirma que el volumen de fallos superó el umbral configurado, lo que en producción requiere respuesta inmediata.</span>
+    </div>
+
+    <div class="lesson-item">
+      <span class="lesson-num">03</span>
+      <span>La atribución completa en un SIEM requiere correlación de múltiples fuentes. Depender exclusivamente del Security Log de Windows para obtener la IP atacante es insuficiente cuando el vector es SSH.</span>
+    </div>
+
+    <div class="lesson-item">
+      <span class="lesson-num">04</span>
+      <span>Windows Firewall bloqueaba ICMP por defecto, lo que inicialmente impedía la conectividad entre Kali y el endpoint. En un entorno real, un atacante no dependería de ICMP para lanzar el ataque — usaría directamente el puerto 22.</span>
+    </div>
+
+  </div>
+
+  <!-- CAMPAIGN NAV -->
+  <div class="campaign-nav">
+    <div class="campaign-nav-title">Campaña — Windows Endpoint Attack Simulation</div>
+    <div class="campaign-nav-grid">
+      <a href="case-w01.html" class="nav-case active">W01 — SSH Brute Force</a>
+      <a href="case-w02.html" class="nav-case">W02 — Creación de Usuarios</a>
+      <a href="case-w03.html" class="nav-case">W03 — Ejecución PowerShell</a>
+      <a href="case-w04.html" class="nav-case">W04 — Elevación de Privilegios</a>
+      <a href="case-w05.html" class="nav-case">W05 — Descarga de Archivos</a>
+      <a href="case-w06.html" class="nav-case">W06 — Persistencia</a>
+      <a href="case-w07.html" class="nav-case">W07 — Escaneo de Puertos</a>
+      <a href="case-w08.html" class="nav-case">W08 — Conexiones RDP</a>
+      <a href="case-w09.html" class="nav-case">W09 — PsExec / WMI</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
