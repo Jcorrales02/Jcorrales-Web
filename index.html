@@ -6,15 +6,13 @@
     <title>José Corrales · SOC Analyst</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="scanlines" aria-hidden="true"></div>
-    <div class="noise" aria-hidden="true"></div>
     <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
     <div class="layout">
@@ -23,53 +21,42 @@
         <aside class="sidebar">
             <div class="sidebar-inner">
 
-                <div class="status-bar">
-                    <span class="status-dot"></span>
-                    <span class="status-text">AVAILABLE FOR HIRE</span>
+                <div class="sidebar-top">
+                    <div class="identity">
+                        <h1>José Corrales<span class="accent">.</span></h1>
+                        <p class="role-line">SOC Analyst</p>
+                        <p class="role-sub">Security Operations</p>
+                    </div>
+
+                    <nav class="main-nav">
+                        <ul>
+                            <li><a href="#about"><span class="nav-label">Sobre mí</span></a></li>
+                            <li><a href="#experience"><span class="nav-label">Experiencia</span></a></li>
+                            <li><a href="#education"><span class="nav-label">Educación</span></a></li>
+                            <li><a href="#lab-projects"><span class="nav-label">Proyectos</span></a></li>
+                            <li><a href="#projects"><span class="nav-label">SOC Case Files</span></a></li>
+                            <li><a href="#upskilling"><span class="nav-label">Formación</span></a></li>
+                            <li><a href="#contact"><span class="nav-label">Contacto</span></a></li>
+                        </ul>
+                    </nav>
                 </div>
 
-                <div class="identity">
-                    <p class="identity-label">// analyst</p>
-                    <h1>José<br>Corrales<span class="accent">.</span></h1>
-                    <p class="role-line">SOC <span class="dim">·</span> Security Operations</p>
-                    <p class="level-badge">Entry-Level <span class="accent">▸</span> Open to Opportunities</p>
-                </div>
-
-                <p class="tagline">
-                    Alert triage · IOC analysis<br>
-                    Documentation · Escalation<br>
-                    Networking fundamentals
-                </p>
-
-                <nav class="main-nav">
-                    <ul>
-                        <li><a href="#about"><span class="nav-num">01</span><span class="nav-label">Sobre mí</span></a></li>
-                        <li><a href="#experience"><span class="nav-num">02</span><span class="nav-label">Experiencia</span></a></li>
-                        <li><a href="#education"><span class="nav-num">03</span><span class="nav-label">Educación</span></a></li>
-                        <li><a href="#lab-projects"><span class="nav-num">04</span><span class="nav-label">Proyectos</span></a></li>
-                        <li><a href="#projects"><span class="nav-num">05</span><span class="nav-label">SOC Case Files</span></a></li>
-                        <li><a href="#upskilling"><span class="nav-num">06</span><span class="nav-label">Formación</span></a></li>
-                        <li><a href="#contact"><span class="nav-num">07</span><span class="nav-label">Contacto</span></a></li>
-                    </ul>
-                </nav>
-
-                <div class="social-icons">
-                    <a href="https://github.com/jcorrales02" target="_blank" title="GitHub" aria-label="GitHub">
-                        <i class="fab fa-github"></i>
-                    </a>
-                    <a href="https://linkedin.com/in/jcorrales02" target="_blank" title="LinkedIn" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="https://www.credly.com/users/jose-corrales002/badges" target="_blank" title="Credly" aria-label="Credly">
-                        <i class="fas fa-certificate"></i>
-                    </a>
-                    <a href="https://tryhackme.com/p/jose002" target="_blank" title="TryHackMe" aria-label="TryHackMe">
-                        <i class="fas fa-terminal"></i>
-                    </a>
-                </div>
-
-                <div class="sidebar-footer">
-                    <span class="mono dim">PA · Panamá</span>
+                <div class="sidebar-bottom">
+                    <div class="social-icons">
+                        <a href="https://github.com/jcorrales02" target="_blank" title="GitHub" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://linkedin.com/in/jcorrales02" target="_blank" title="LinkedIn" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://www.credly.com/users/jose-corrales002/badges" target="_blank" title="Credly" aria-label="Credly">
+                            <i class="fas fa-certificate"></i>
+                        </a>
+                        <a href="https://tryhackme.com/p/jose002" target="_blank" title="TryHackMe" aria-label="TryHackMe">
+                            <i class="fas fa-terminal"></i>
+                        </a>
+                    </div>
+                    <span class="mono dim sidebar-location">PA · Panamá</span>
                 </div>
 
             </div>
@@ -80,43 +67,60 @@
 
             <!-- ── 01 ABOUT ── -->
             <section id="about">
-                <div class="section-header">
-                    <span class="section-tag mono">_about</span>
-                    <h2>Sobre mí</h2>
-                    <div class="header-line"></div>
-                </div>
                 <div class="about-body">
                     <p>
                         Actualmente curso una <strong>Maestría en Ciberseguridad</strong> y estoy enfocando mi desarrollo hacia <strong>Operaciones SOC (entry-level)</strong>. Me interesa especialmente el trabajo operativo del día a día: mantener visibilidad, responder con orden y asegurar continuidad mediante procesos claros y repetibles.
                     </p>
                     <p>
-                        Me gusta el trabajo estructurado y orientado a proceso: <strong>monitoreo</strong>, análisis inicial de alertas (triage), recolección de evidencia, documentación, seguimiento y escalamiento oportuno. Mi base en redes y soporte me ha ayudado a desarrollar pensamiento de diagnóstico, atención al detalle y comunicación clara.
+                        Mi base en redes y soporte me ha ayudado a desarrollar pensamiento de diagnóstico, atención al detalle y comunicación clara.
                     </p>
                     <p>
                         Aunque mi experiencia SOC ha sido principalmente académica y de laboratorio, estoy comprometido con convertirla en evidencia real: por eso documento casos, aprendizajes y decisiones en <strong>SOC Case Files</strong>, con reportes cortos y recomendaciones accionables. Busco una oportunidad donde pueda aportar disciplina operativa y aprender rápido dentro de un equipo SOC.
                     </p>
                     <div class="skill-matrix">
-                        <div class="skill-group">
-                            <p class="skill-group-label mono">// core skills</p>
-                            <div class="tags">
-                                <span class="tag">Alert Triage</span>
-                                <span class="tag">IOC Analysis</span>
-                                <span class="tag">Incident Documentation</span>
-                                <span class="tag">Escalation</span>
-                                <span class="tag">Log Review</span>
+                        <p class="skill-group-label mono"></p>
+                            <div class="tool-logos">
+                                <div class="tool-logo-item" title="Wazuh">
+                                    <img src="img/logos/Wazuh-Logo.svg" alt="Wazuh" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fas fa-shield-halved"></i></div>
+                                    
+                                </div>
+                                <div class="tool-logo-item" title="Wireshark">
+                                    <img src="img/logos/Wireshark_icon.svg" alt="Wireshark" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fas fa-fish"></i></div>
+                                    
+                                </div>
+                                <div class="tool-logo-item" title="n8n SOAR">
+                                    <img src="img/logos/N8n-logo-new.svg" alt="n8n" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fas fa-robot"></i></div>
+                                    
+                                </div>
+                                <div class="tool-logo-item" title="AWS CloudTrail">
+                                    <img src="img/logos/Aws_logo.svg" alt="AWS" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fab fa-aws"></i></div>
+                                    
+                                </div>
+                                <div class="tool-logo-item" title="Linux">
+                                    <img src="img/logos/linux-logo.svg" alt="Linux" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fab fa-linux"></i></div>
+                                    <span>Linux</span>
+                                </div>
+                                <div class="tool-logo-item" title="Windows">
+                                    <img src="img/logos/Windows_logo-2021.svg" alt="Windows" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fab fa-windows"></i></div>
+                                    <span>Windows</span>
+                                </div>
+                                <div class="tool-logo-item" title="Sysmon">
+                                    <img src="img/logos/eye-logo.svg" alt="Sysmon" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fas fa-eye"></i></div>
+                                    <span>Sysmon</span>
+                                </div>
+                                <div class="tool-logo-item" title="Kali Linux">
+                                    <img src="img/logos/VirusTotal_logo.svg" alt="VirusTotal" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                    <div class="tool-logo-fallback" style="display:none"><i class="fas fa-virus-slash"></i></div>
+                                    
+                                </div>
                             </div>
-                        </div>
-                        <div class="skill-group">
-                            <p class="skill-group-label mono">// tools & platforms</p>
-                            <div class="tags">
-                                <span class="tag">Wazuh</span>
-                                <span class="tag">Wireshark</span>
-                                <span class="tag">n8n SOAR</span>
-                                <span class="tag">AWS CloudTrail</span>
-                                <span class="tag">Linux</span>
-                                <span class="tag">Windows</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -394,68 +398,292 @@
 
                 <!-- HOME LAB CASES -->
                 <div class="case-panel active" id="panel-homelab">
-                    <div class="case-grid">
 
-                        <article class="case-card card-hover" data-sev="high">
-                            <div class="case-card-top">
-                                <div class="case-id-wrap">
-                                    <span class="case-id mono">CASE-001</span>
-                                    <span class="case-status status-done">Cerrado</span>
-                                    <span class="case-sev sev-high">Alto</span>
-                                </div>
-                                <h3>Brute Force SSH — Detección con Wazuh</h3>
-                            </div>
-                            <p>Ataque de fuerza bruta SSH generado con Hydra desde Kali Linux. 1.183 intentos fallidos en 2m 40s, mapeados a MITRE ATT&CK T1110. Análisis de patrón, escalada de severidad y recomendaciones de contención.</p>
-                            <div class="tags">
-                                <span class="tag">Brute Force</span>
-                                <span class="tag">SSH</span>
-                                <span class="tag">Wazuh</span>
-                                <span class="tag">MITRE T1110</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-001-bruteforce.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
-                        </article>
-
-                        <article class="case-card card-hover" data-sev="critical">
-                            <div class="case-card-top">
-                                <div class="case-id-wrap">
-                                    <span class="case-id mono">CASE-002</span>
-                                    <span class="case-status status-done">Cerrado</span>
-                                    <span class="case-sev sev-critical">Crítico</span>
-                                </div>
-                                <h3>Windows - SSH Brute Force & Account Lockout  — Fase 1 de 9</h3>
-                            </div>
-                            <p>Ataque de fuerza bruta SSH simulado con Hydra desde Kali Linux contra endpoint Windows 10. Múltiples Event 4625 en 11 segundos, bloqueo de cuenta (Event 4740) detectado por Wazuh. Correlación de IP atacante via canal OpenSSH/Operational. Mapeado a MITRE ATT&CK T1110.001 y T1531.</p>
-                            <div class="tags">
-                                <span class="tag">SSH / Port 22</span>
-                                <span class="tag">Sysmon</span>
-                                <span class="tag">Wazuh</span>
-                                <span class="tag">MITRE T1110</span>
-                                <span class="tag">Windows 10 Home</span>
-                            </div>
-                            <a href="case-files/home-lab-case-w01.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
-                        </article>
-
-                        <article class="case-card card-hover case-upcoming" data-sev="all">
-                            <div class="case-card-top">
-                                <div class="case-id-wrap">
-                                    <span class="case-id mono">CASE-003</span>
-                                    <span class="case-status status-next">Próximo</span>
-                                </div>
-                                <h3>En desarrollo…</h3>
-                            </div>
-                            <p>Próximo caso del home lab — Fase 2 de 9 — Creación de usuarios locales en windows y verificar logs generados.</p>
-                            <div class="tags">
-                                <span class="tag">Coming soon</span>
-                            </div>
-                            <span class="case-link dim">Reporte en preparación…</span>
-                        </article>
-
+                    <!-- Sub-tabs Home Lab -->
+                    <div class="lab-subtabs">
+                        <button class="lab-subtab active" data-subtab="linux-lab">
+                            <i class="fab fa-linux"></i> Linux / Wazuh Lab
+                        </button>
+                        <button class="lab-subtab" data-subtab="windows-lab">
+                            <i class="fab fa-windows"></i> Windows Sysmon Lab
+                        </button>
                     </div>
+
+                    <!-- LINUX LAB -->
+                    <div class="lab-subpanel active" id="subpanel-linux-lab">
+                        <div class="case-grid-h">
+                            <article class="case-card-h card-hover" data-sev="high">
+                                <div class="case-card-h-img">
+                                    <img src="img/setup-wazuh.webp" alt="Brute Force SSH" onerror="this.parentElement.classList.add('no-img')">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-terminal"></i>
+                                        <span class="mono">CASE-001</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-001</span>
+                                        <span class="case-status status-done">Cerrado</span>
+                                        <span class="case-sev sev-high">Alto</span>
+                                    </div>
+                                    <h3>Brute Force SSH — Detección con Wazuh</h3>
+                                    <p>Ataque de fuerza bruta SSH generado con Hydra desde Kali Linux. 1.183 intentos fallidos en 2m 40s, mapeados a MITRE ATT&CK T1110. Análisis de patrón, escalada de severidad y recomendaciones de contención.</p>
+                                    <div class="tags">
+                                        <span class="tag">Brute Force</span>
+                                        <span class="tag">SSH</span>
+                                        <span class="tag">Wazuh</span>
+                                        <span class="tag">MITRE T1110</span>
+                                        <span class="tag">True Positive</span>
+                                    </div>
+                                    <a href="case-files/case-001-bruteforce.html" class="case-link">
+                                        Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-clock"></i>
+                                        <span class="mono">PRÓXIMO</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-002</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>En desarrollo…</h3>
+                                    <p>Próximo caso del Linux Lab en preparación.</p>
+                                    <div class="tags"><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- WINDOWS SYSMON LAB -->
+                    <div class="lab-subpanel" id="subpanel-windows-lab">
+
+                        <!-- Campaign banner -->
+                        <div class="campaign-banner">
+                            <div class="campaign-banner-img" style="background-image: url('img/home-lab-w01.jpg')"></div>
+                            <div class="campaign-banner-overlay"></div>
+                            <div class="campaign-banner-content">
+                                <span class="campaign-label mono">// campaña activa</span>
+                                <h3>Windows Endpoint Attack Simulation</h3>
+                                <p>Simulación completa de ataque contra endpoint Windows 10 con Sysmon + Wazuh. Nueve fases documentadas desde brute force inicial hasta ejecución de herramientas administrativas.</p>
+                                <div class="campaign-progress">
+                                    <div class="campaign-progress-bar">
+                                        <div class="campaign-progress-fill" style="width: 22.2%"></div>
+                                    </div>
+                                    <span class="mono">2 / 9 casos completados</span>
+                                </div>
+                                <div class="tags mt">
+                                    <span class="tag">Windows 10</span>
+                                    <span class="tag">Sysmon v15.20</span>
+                                    <span class="tag">Wazuh 4.7.5</span>
+                                    <span class="tag">Kali Linux</span>
+                                    <span class="tag">MITRE ATT&CK</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Windows cases horizontal grid -->
+                        <div class="case-grid-h">
+
+                            <article class="case-card-h card-hover" data-sev="high">
+                                <div class="case-card-h-img">
+                                    <img src="img/home-lab-w01.webp" alt="CASE-W01" onerror="this.parentElement.classList.add('no-img')">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-key"></i>
+                                        <span class="mono">W01</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W01</span>
+                                        <span class="case-status status-done">Cerrado</span>
+                                        <span class="case-sev sev-high">Alto</span>
+                                    </div>
+                                    <h3>SSH Brute Force & Account Lockout — Fase 1/9</h3>
+                                    <p>Múltiples Event 4625 en 11 segundos, bloqueo de cuenta (Event 4740) detectado por Wazuh. Correlación de IP atacante via canal OpenSSH/Operational. Mapeado a T1110.001 y T1531.</p>
+                                    <div class="tags">
+                                        <span class="tag">SSH / Port 22</span>
+                                        <span class="tag">Sysmon</span>
+                                        <span class="tag">T1110.001</span>
+                                        <span class="tag">T1531</span>
+                                    </div>
+                                    <a href="case-files/home-lab-case-w01.html" class="case-link">
+                                        Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover" data-sev="high">
+                                <div class="case-card-h-img">
+                                    <img src="img/captura-wazuh-w02.png" alt="CASE-W02" onerror="this.parentElement.classList.add('no-img')">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span class="mono">W02</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W02</span>
+                                        <span class="case-status status-done">Cerrado</span>
+                                        <span class="case-sev sev-high">Alto</span>
+                                    </div>
+                                    <h3>Creación de Usuario Local Malicioso — Fase 2/9</h3>
+                                    <p>Cuenta hacker3 creada via net.exe, escalada al grupo Administradores (nivel 12) y eliminada para cubrir rastros. Ciclo completo en menos de 4 minutos. T1136.001, T1098 y T1531.</p>
+                                    <div class="tags">
+                                        <span class="tag">Local Account</span>
+                                        <span class="tag">Privilege Escalation</span>
+                                        <span class="tag">LOLBin</span>
+                                        <span class="tag">T1136.001</span>
+                                    </div>
+                                    <a href="case-files/home-lab-case-w02.html" class="case-link">
+                                        Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                    </a>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-terminal"></i>
+                                        <span class="mono">W03</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W03</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Ejecución de PowerShell — Fase 3/9</h3>
+                                    <p>Ejecución de scripts PowerShell con ExecutionPolicy Bypass. Script Block Logging, Sysmon EID 1 y EID 4104.</p>
+                                    <div class="tags"><span class="tag">PowerShell</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-shield-halved"></i>
+                                        <span class="mono">W04</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W04</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Elevación de Privilegios — Fase 4/9</h3>
+                                    <p>Escalada de privilegios via runas y UAC. Event 4672, Sysmon IntegrityLevel High.</p>
+                                    <div class="tags"><span class="tag">Privilege Escalation</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-download"></i>
+                                        <span class="mono">W05</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W05</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Descarga de Archivos — Fase 5/9</h3>
+                                    <p>Descarga via Invoke-WebRequest y certutil (LOLBin). Sysmon EID 3 y EID 15.</p>
+                                    <div class="tags"><span class="tag">LOLBin</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-database"></i>
+                                        <span class="mono">W06</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W06</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Persistencia — Registry Run Keys — Fase 6/9</h3>
+                                    <p>Persistencia via Registry Run Keys y Startup folder. Sysmon EID 13.</p>
+                                    <div class="tags"><span class="tag">Persistence</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-network-wired"></i>
+                                        <span class="mono">W07</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W07</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Escaneo de Puertos desde Kali — Fase 7/9</h3>
+                                    <p>Reconocimiento con nmap y masscan. Sysmon EID 3 múltiples conexiones entrantes.</p>
+                                    <div class="tags"><span class="tag">Reconnaissance</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-desktop"></i>
+                                        <span class="mono">W08</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W08</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>Conexiones RDP — Fase 8/9</h3>
+                                    <p>Brute force RDP con hydra y acceso exitoso. Event 4624 Logon Type 10.</p>
+                                    <div class="tags"><span class="tag">RDP</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                            <article class="case-card-h card-hover case-upcoming" data-sev="all">
+                                <div class="case-card-h-img">
+                                    <div class="case-card-h-img-fallback">
+                                        <i class="fas fa-gears"></i>
+                                        <span class="mono">W09</span>
+                                    </div>
+                                </div>
+                                <div class="case-card-h-body">
+                                    <div class="case-id-wrap">
+                                        <span class="case-id mono">CASE-W09</span>
+                                        <span class="case-status status-next">Próximo</span>
+                                    </div>
+                                    <h3>PsExec / WMI — Fase 9/9</h3>
+                                    <p>Ejecución remota via PsExec y WMI. Sysmon EID 1 cadena de procesos post-explotación.</p>
+                                    <div class="tags"><span class="tag">PsExec</span><span class="tag">WMI</span><span class="tag">Coming soon</span></div>
+                                    <span class="case-link dim">Reporte en preparación…</span>
+                                </div>
+                            </article>
+
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- LETSDEFEND CASES -->
@@ -463,127 +691,137 @@
                     <div class="case-grid">
 
                         <article class="case-card card-hover" data-sev="critical">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-critical">
+                                <span class="case-banner-icon"><i class="fas fa-bug"></i></span>
+                                <span class="case-id mono">SOC336</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC336</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-critical">Crítico</span>
                                 </div>
                                 <h3>CVE-2025-21298 — OLE RCE via Phishing RTF</h3>
+                                <p>Explotación zero-click en Windows OLE via adjunto RTF. Cadena OUTLOOK.EXE → cmd.exe → regsvr32.exe confirmó RCE. Técnica Squiblydoo con conexión C2 activa.</p>
+                                <div class="tags">
+                                    <span class="tag">Phishing</span>
+                                    <span class="tag">RCE</span>
+                                    <span class="tag">LOLBIN</span>
+                                    <span class="tag">CVE-2025-21298</span>
+                                </div>
+                                <a href="case-files/case-006-ole-rce.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Explotación zero-click en Windows OLE via adjunto RTF. Cadena OUTLOOK.EXE → cmd.exe → regsvr32.exe confirmó RCE. Técnica Squiblydoo con conexión C2 activa.</p>
-                            <div class="tags">
-                                <span class="tag">Phishing</span>
-                                <span class="tag">RCE</span>
-                                <span class="tag">LOLBIN</span>
-                                <span class="tag">CVE-2025-21298</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-006-ole-rce.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover" data-sev="critical">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-critical">
+                                <span class="case-banner-icon"><i class="fas fa-spider"></i></span>
+                                <span class="case-id mono">SOC342</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC342</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-critical">Crítico</span>
                                 </div>
                                 <h3>CVE-2025-53770 ToolShell — SharePoint RCE</h3>
+                                <p>Zero-day crítico en SharePoint Server. Auth bypass + RCE confirmado. Extracción de MachineKeys, compilación de payload con csc.exe y webshell persistente desplegada.</p>
+                                <div class="tags">
+                                    <span class="tag">SharePoint</span>
+                                    <span class="tag">WebShell</span>
+                                    <span class="tag">CVE-2025-53770</span>
+                                </div>
+                                <a href="case-files/case-004-sharepoint-toolshell.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Zero-day crítico en SharePoint Server. Auth bypass + RCE confirmado. Extracción de MachineKeys, compilación de payload con csc.exe y webshell persistente desplegada.</p>
-                            <div class="tags">
-                                <span class="tag">SharePoint</span>
-                                <span class="tag">WebShell</span>
-                                <span class="tag">CVE-2025-53770</span>
-                                <span class="tag">Critical</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-004-sharepoint-toolshell.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover" data-sev="medium">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-medium">
+                                <span class="case-banner-icon"><i class="fas fa-terminal"></i></span>
+                                <span class="case-id mono">SOC153</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC153</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-medium">Medio</span>
                                 </div>
                                 <h3>PowerShell Malicioso — KOI-STEALER</h3>
+                                <p>Script PowerShell con ExecutionPolicy Bypass descargado y ejecutado en endpoint Windows. Comunicación C2 con kionagranada.com confirmada via Sysmon EventID 22. Infostealer activo.</p>
+                                <div class="tags">
+                                    <span class="tag">PowerShell</span>
+                                    <span class="tag">Infostealer</span>
+                                    <span class="tag">C2</span>
+                                    <span class="tag">T1059.001</span>
+                                </div>
+                                <a href="case-files/case-003-powershell-koi.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Script PowerShell con ExecutionPolicy Bypass descargado y ejecutado en endpoint Windows. Comunicación C2 con kionagranada.com confirmada via Sysmon EventID 22. Infostealer activo.</p>
-                            <div class="tags">
-                                <span class="tag">PowerShell</span>
-                                <span class="tag">Infostealer</span>
-                                <span class="tag">C2</span>
-                                <span class="tag">T1059.001</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-003-powershell-koi.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover" data-sev="medium">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-medium">
+                                <span class="case-banner-icon"><i class="fas fa-database"></i></span>
+                                <span class="case-id mono">SOC127</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC127</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-medium">Medio</span>
                                 </div>
                                 <h3>SQL Injection + XSS + RCE Automatizado</h3>
+                                <p>Payload automatizado combinando SQLi, XSS y xp_cmdshell contra servidor web interno. HTTP 200 con impacto indeterminado por falta de acceso a logs del endpoint.</p>
+                                <div class="tags">
+                                    <span class="tag">SQLi</span>
+                                    <span class="tag">XSS</span>
+                                    <span class="tag">Web Attack</span>
+                                    <span class="tag">T1190</span>
+                                </div>
+                                <a href="case-files/case-005-sqli.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Payload automatizado combinando SQLi, XSS y xp_cmdshell contra servidor web interno. HTTP 200 con impacto indeterminado por falta de acceso a logs del endpoint.</p>
-                            <div class="tags">
-                                <span class="tag">SQLi</span>
-                                <span class="tag">XSS</span>
-                                <span class="tag">Web Attack</span>
-                                <span class="tag">T1190</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-005-sqli.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover" data-sev="critical">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-critical">
+                                <span class="case-banner-icon"><i class="fas fa-skull"></i></span>
+                                <span class="case-id mono">SOC-335</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC-335</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-critical">Crítico</span>
                                 </div>
                                 <h3>Brute Force + CVE-2024-49138 Privilege Escalation</h3>
+                                <p>Fuerza bruta exitosa contra cuenta Windows (4625→4624). Malware svohost.exe con masquerading de svchost.exe descargado via PowerShell. Reconocimiento post-compromiso con whoami.</p>
+                                <div class="tags">
+                                    <span class="tag">Brute Force</span>
+                                    <span class="tag">Masquerading</span>
+                                    <span class="tag">CVE-2024-49138</span>
+                                </div>
+                                <a href="case-files/case-007-bruteforce-malware.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Fuerza bruta exitosa contra cuenta Windows (4625→4624). Malware svohost.exe con masquerading de svchost.exe descargado via PowerShell. Reconocimiento post-compromiso con whoami.</p>
-                            <div class="tags">
-                                <span class="tag">Brute Force</span>
-                                <span class="tag">Masquerading</span>
-                                <span class="tag">CVE-2024-49138</span>
-                                <span class="tag">True Positive</span>
-                            </div>
-                            <a href="case-files/case-007-bruteforce-malware.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover case-upcoming" data-sev="all">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-upcoming">
+                                <span class="case-banner-icon"><i class="fas fa-clock"></i></span>
+                                <span class="case-id mono">SOC-X</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">SOC-X</span>
                                     <span class="case-status status-next">Próximo</span>
                                 </div>
                                 <h3>En desarrollo…</h3>
+                                <p>Próximo caso de LetsDefend en análisis.</p>
+                                <div class="tags"><span class="tag">Coming soon</span></div>
+                                <span class="case-link dim">Reporte en preparación…</span>
                             </div>
-                            <p>Próximo caso de LetsDefend en análisis.</p>
-                            <div class="tags">
-                                <span class="tag">Coming soon</span>
-                            </div>
-                            <span class="case-link dim">Reporte en preparación…</span>
                         </article>
 
                     </div>
@@ -594,40 +832,43 @@
                     <div class="case-grid">
 
                         <article class="case-card card-hover" data-sev="medium">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-medium">
+                                <span class="case-banner-icon"><i class="fas fa-fish"></i></span>
+                                <span class="case-id mono">CD-01</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">CD-01</span>
                                     <span class="case-status status-done">Cerrado</span>
                                     <span class="case-sev sev-medium">Medio</span>
                                 </div>
                                 <h3>Tomcat Takeover — Análisis PCAP</h3>
+                                <p>Análisis de tráfico de red de ataque completo contra Apache Tomcat. Escaneo, Gobuster, fuerza bruta con credenciales por defecto y webshell WAR con reverse shell hacia C2 en China.</p>
+                                <div class="tags">
+                                    <span class="tag">PCAP</span>
+                                    <span class="tag">Wireshark</span>
+                                    <span class="tag">Apache Tomcat</span>
+                                    <span class="tag">WebShell</span>
+                                </div>
+                                <a href="case-files/case-cd01-tomcat-takeover.html" class="case-link">
+                                    Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
+                                </a>
                             </div>
-                            <p>Análisis de tráfico de red de ataque completo contra Apache Tomcat. Escaneo, Gobuster, fuerza bruta con credenciales por defecto y webshell WAR con reverse shell hacia C2 en China.</p>
-                            <div class="tags">
-                                <span class="tag">PCAP</span>
-                                <span class="tag">Wireshark</span>
-                                <span class="tag">Apache Tomcat</span>
-                                <span class="tag">WebShell</span>
-                                <span class="tag">Reverse Shell</span>
-                            </div>
-                            <a href="case-files/case-cd01-tomcat-takeover.html" class="case-link">
-                                Ver reporte <i class="fas fa-arrow-right fa-xs"></i>
-                            </a>
                         </article>
 
                         <article class="case-card card-hover case-upcoming" data-sev="all">
-                            <div class="case-card-top">
+                            <div class="case-card-banner sev-banner-upcoming">
+                                <span class="case-banner-icon"><i class="fas fa-clock"></i></span>
+                                <span class="case-id mono">CD-02</span>
+                            </div>
+                            <div class="case-card-body">
                                 <div class="case-id-wrap">
-                                    <span class="case-id mono">CD-02</span>
                                     <span class="case-status status-next">Próximo</span>
                                 </div>
                                 <h3>En desarrollo…</h3>
+                                <p>Próximo lab de CyberDefenders en análisis.</p>
+                                <div class="tags"><span class="tag">Coming soon</span></div>
+                                <span class="case-link dim">Reporte en preparación…</span>
                             </div>
-                            <p>Próximo lab de CyberDefenders en análisis.</p>
-                            <div class="tags">
-                                <span class="tag">Coming soon</span>
-                            </div>
-                            <span class="case-link dim">Reporte en preparación…</span>
                         </article>
 
                     </div>
@@ -749,27 +990,8 @@
         </main>
     </div>
 
-    <script src="scroll-nav.js"></script>
-    <script>
-        // Cursor glow
-        const glow = document.getElementById('cursorGlow');
-        document.addEventListener('mousemove', e => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
 
-        // Typing effect
-        const statusText = document.querySelector('.status-text');
-        const msg = 'AVAILABLE FOR HIRE';
-        let i = 0;
-        statusText.textContent = '';
-        function type() {
-            if (i < msg.length) {
-                statusText.textContent += msg[i++];
-                setTimeout(type, 80);
-            }
-        }
-        setTimeout(type, 800);
+    <script>
 
         // Modal logic
         document.querySelectorAll('.ver-diploma-btn').forEach(btn => {
@@ -794,40 +1016,91 @@
             }
         });
 
-        // Case tabs
+        // ------------------------------------------------
+        // 1. FUNCIÓN PARA RESTABLECER TODAS LAS TARJETAS
+        // ------------------------------------------------
+        function resetAllCards() {
+            document.querySelectorAll('.case-card, .case-card-h').forEach(c => {
+                c.style.display = '';
+            });
+        }
+
+        // ------------------------------------------------
+        // 2. FUNCIÓN PARA ACTIVAR EL FILTRO "TODOS"
+        // ------------------------------------------------
+        function setFilterAll() {
+            document.querySelectorAll('.sev-filter').forEach(f => f.classList.remove('active'));
+            const allBtn = document.querySelector('.sev-filter[data-sev="all"]');
+            if (allBtn) allBtn.classList.add('active');
+        }
+
+        // ------------------------------------------------
+        // 3. FUNCIÓN PARA APLICAR FILTRO DE SEVERIDAD
+        // ------------------------------------------------
+        function applySeverityFilter(sev) {
+            const activePanel = document.querySelector('.case-panel.active');
+            if (!activePanel) return;
+
+            const cards = activePanel.querySelectorAll('.case-card, .case-card-h');
+            cards.forEach(card => {
+                const cardSev = card.dataset.sev || 'all';
+                if (sev === 'all' || cardSev === sev || cardSev === 'all') {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // ------------------------------------------------
+        // 4. EVENTOS DE PESTAÑAS (Home Lab / LetsDefend / CyberDefenders)
+        // ------------------------------------------------
         document.querySelectorAll('.case-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.case-panel').forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
                 document.getElementById('panel-' + this.dataset.tab).classList.add('active');
-                document.querySelectorAll('.sev-filter').forEach(f => f.classList.remove('active'));
-                document.querySelector('.sev-filter[data-sev="all"]').classList.add('active');
-                document.querySelectorAll('.case-card').forEach(c => c.style.display = '');
+
+                resetAllCards();
+                setFilterAll();
             });
         });
 
-        // Severity filters
-        document.querySelectorAll('.sev-filter').forEach(filter => {
-            filter.addEventListener('click', function() {
-                document.querySelectorAll('.sev-filter').forEach(f => f.classList.remove('active'));
+        // ------------------------------------------------
+        // 5. EVENTOS DE SUBPESTAÑAS (Linux / Windows)
+        // ------------------------------------------------
+        document.querySelectorAll('.lab-subtab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.lab-subtab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.lab-subpanel').forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
-                const sev = this.dataset.sev;
-                const activePanel = document.querySelector('.case-panel.active');
-                activePanel.querySelectorAll('.case-card').forEach(card => {
-                    if (sev === 'all' || card.dataset.sev === sev || card.dataset.sev === 'all') {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+                document.getElementById('subpanel-' + this.dataset.subtab).classList.add('active');
+
+                resetAllCards();
+                setFilterAll();
             });
         });
 
-        // Resalta el link de navegación correspondiente a la sección visible
+        // ------------------------------------------------
+        // 6. EVENTOS DE FILTROS DE SEVERIDAD
+        // ------------------------------------------------
+        document.querySelectorAll('.sev-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.sev-filter').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const sev = this.dataset.sev;
+                applySeverityFilter(sev);
+            });
+        });
+
+        // ------------------------------------------------
+        // 7. NAVEGACIÓN POR SCROLL (resaltar secciones)
+        // ------------------------------------------------
         const sections = document.querySelectorAll('main section[id]');
         const navLinks = document.querySelectorAll('.main-nav a');
-        
+
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -843,8 +1116,21 @@
             rootMargin: '-30% 0px -60% 0px',
             threshold: 0
         });
-        
+
         sections.forEach(section => observer.observe(section));
+
+        const glow = document.getElementById('cursorGlow');
+        glow.style.opacity = '1';
+        document.addEventListener('mousemove', e => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => {
+            glow.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', () => {
+            glow.style.opacity = '1';
+        });
     </script>
 </body>
 </html>

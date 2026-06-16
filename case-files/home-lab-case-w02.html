@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CASE-W02 — Creación de Usuario Local Malicioso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #0a0e14;
+      --surface:   #0f1520;
+      --border:    #1e2d40;
+      --accent:    #00aaff;
+      --accent2:   #ff4444;
+      --accent3:   #00ff88;
+      --text:      #c9d4e0;
+      --text-dim:  #5a6a7e;
+      --mono:      'Share Tech Mono', monospace;
+      --sans:      'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.7; padding: 40px 20px 80px; }
+    .wrapper { max-width: 900px; margin: 0 auto; }
+    .case-header { border-left: 3px solid var(--accent); padding-left: 20px; margin-bottom: 40px; }
+    .campaign-tag { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+    .campaign-tag a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+    h1 { font-family: var(--mono); font-size: 26px; color: #fff; margin-bottom: 10px; }
+    .case-id { font-family: var(--mono); font-size: 13px; color: var(--text-dim); }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 36px; }
+    .badge { font-family: var(--mono); font-size: 11px; padding: 4px 12px; border-radius: 2px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .badge-high  { background: rgba(255,68,68,0.12);  color: var(--accent2); border: 1px solid rgba(255,68,68,0.3); }
+    .badge-blue  { background: rgba(0,170,255,0.08);  color: var(--accent);  border: 1px solid rgba(0,170,255,0.25); }
+    .badge-green { background: rgba(0,255,136,0.08);  color: var(--accent3); border: 1px solid rgba(0,255,136,0.25); }
+    .badge-gray  { background: rgba(90,106,126,0.15); color: var(--text-dim);border: 1px solid rgba(90,106,126,0.3); }
+    .section { margin-bottom: 40px; }
+    h2 { font-family: var(--mono); font-size: 13px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    p { color: var(--text); margin-bottom: 12px; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .meta-grid { grid-template-columns: 1fr; } }
+    .meta-item { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; }
+    .meta-label { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+    .meta-value { font-family: var(--mono); font-size: 13px; color: #fff; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid rgba(30,45,64,0.5); font-family: var(--mono); font-size: 12px; color: var(--text); vertical-align: top; }
+    tbody tr:hover td { background: rgba(0,170,255,0.03); }
+    .eid { color: var(--accent); white-space: nowrap; }
+    .rule-id { color: var(--accent3); }
+    .sev-high   { color: var(--accent2); }
+    .sev-medium { color: #ffaa00; }
+    .sev-low    { color: var(--accent3); }
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 1px; background: var(--border); }
+    .tl-item { position: relative; margin-bottom: 20px; }
+    .tl-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+    .tl-item.alert::before { background: var(--accent2); }
+    .tl-item.warning::before { background: #ffaa00; }
+    .tl-item.noise::before { background: var(--text-dim); }
+    .tl-time { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-bottom: 2px; }
+    .tl-desc { font-size: 14px; color: var(--text); }
+    .tl-detail { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .mitre-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .mitre-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 14px; }
+    .mitre-tactic { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .mitre-id { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 2px; }
+    .mitre-name { font-size: 13px; color: var(--text); }
+    .ioc-tag { display: inline-block; font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 2px; background: rgba(0,170,255,0.08); color: var(--accent); border: 1px solid rgba(0,170,255,0.2); margin-right: 4px; }
+    .code-block { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; font-family: var(--mono); font-size: 12px; color: var(--text); overflow-x: auto; margin-bottom: 16px; }
+    .alert-box { background: rgba(255,68,68,0.06); border: 1px solid rgba(255,68,68,0.25); border-left: 3px solid var(--accent2); border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; font-size: 14px; }
+    .info-box { background: rgba(0,170,255,0.05); border: 1px solid rgba(0,170,255,0.2); border-left: 3px solid var(--accent); border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; font-size: 14px; }
+    .warning-box { background: rgba(255,170,0,0.05); border: 1px solid rgba(255,170,0,0.2); border-left: 3px solid #ffaa00; border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; font-size: 14px; }
+    .evidence-img { width: 100%; border: 1px solid var(--border); border-radius: 4px; margin-top: 12px; }
+    .img-caption { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 8px; text-align: center; }
+    .lesson-item { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .lesson-num { font-family: var(--mono); font-size: 11px; color: var(--accent); background: rgba(0,170,255,0.08); border: 1px solid rgba(0,170,255,0.2); padding: 2px 8px; border-radius: 2px; white-space: nowrap; margin-top: 2px; }
+    .campaign-nav { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin-top: 48px; }
+    .campaign-nav-title { font-family: var(--mono); font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+    .campaign-nav-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .nav-case { font-family: var(--mono); font-size: 12px; padding: 5px 12px; border-radius: 2px; border: 1px solid var(--border); color: var(--text-dim); text-decoration: none; transition: all 0.15s; }
+    .nav-case.active { border-color: var(--accent); color: var(--accent); background: rgba(0,170,255,0.06); }
+    .nav-case.done { border-color: rgba(0,255,136,0.3); color: var(--accent3); }
+    .nav-case:hover:not(.active) { border-color: rgba(90,106,126,0.6); color: var(--text); }
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="case-header">
+    <div class="campaign-tag">
+      Campaña: Windows Endpoint Attack Simulation — Fase 2 de 9 &nbsp;|&nbsp;
+      <a href="../index.html#projects">← Volver al portfolio</a>
+    </div>
+    <h1>Creación de Usuario Local Malicioso</h1>
+    <div class="case-id">CASE-W02 &nbsp;·&nbsp; Jun 15, 2026 &nbsp;·&nbsp; Home Lab — Wazuh + Sysmon</div>
+  </div>
+
+  <div class="badges">
+    <span class="badge badge-high">Severidad: High</span>
+    <span class="badge badge-blue">Persistence</span>
+    <span class="badge badge-blue">Privilege Escalation</span>
+    <span class="badge badge-green">Resuelto</span>
+    <span class="badge badge-gray">Windows 10 Home</span>
+    <span class="badge badge-gray">Wazuh 4.7.5</span>
+    <span class="badge badge-gray">Sysmon v15.20</span>
+  </div>
+
+  <div class="section">
+    <h2>Resumen del Incidente</h2>
+    <p>
+      Se simuló la creación de una cuenta de usuario local maliciosa en el endpoint
+      <strong>DESKTOP-CC2O1S4</strong> (192.168.0.103), técnica utilizada por atacantes
+      para establecer persistencia tras obtener acceso inicial. El usuario <strong>hacker3</strong>
+      fue creado usando la cuenta <strong>jose</strong> como sujeto ejecutor, agregado al grupo
+      <strong>Administradores</strong> para escalada de privilegios, y posteriormente eliminado
+      para cubrir rastros.
+    </p>
+    <p>
+      Wazuh capturó el ciclo completo: creación de cuenta (60109), modificación (60110),
+      cambio de grupo Administradores nivel 12 (60154), y eliminación de cuenta nivel 8 (60111).
+      Sysmon detectó adicionalmente actividad de <em>discovery</em> via <code>net.exe</code>
+      (reglas 92039 y 92031), enriqueciendo el contexto del incidente.
+    </p>
+    <p>
+      Durante el análisis se identificó ruido legítimo del sistema — múltiples alertas 92217
+      generadas por <code>mousocoreworker.exe</code> (Windows Update), descartadas como falso positivo.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Información del Caso</h2>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Máquina Víctima</div>
+        <div class="meta-value">DESKTOP-CC2O1S4</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">IP Víctima</div>
+        <div class="meta-value">192.168.0.103</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Sujeto Ejecutor</div>
+        <div class="meta-value">jose (cuenta comprometida)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Usuario Creado</div>
+        <div class="meta-value">hacker3</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Grupo Asignado</div>
+        <div class="meta-value">Administradores</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Vector de Acceso</div>
+        <div class="meta-value">SSH — PowerShell remoto</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Herramienta</div>
+        <div class="meta-value">net.exe (LOLBin)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Resultado</div>
+        <div class="meta-value">Cuenta creada, escalada y eliminada</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <h2>Tabla de Evidencia</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Regla Wazuh</th>
+            <th>Nivel</th>
+            <th>Sujeto</th>
+            <th>Objetivo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>15:30:30.578</td>
+            <td class="rule-id">60109</td>
+            <td class="sev-high">8</td>
+            <td>Jose</td>
+            <td>hacker3</td>
+            <td>User account enabled or created</td>
+          </tr>
+          <tr>
+            <td>15:30:30.578</td>
+            <td class="rule-id">60160</td>
+            <td class="sev-medium">5</td>
+            <td>Jose</td>
+            <td>Ninguno</td>
+            <td>Domain users group changed</td>
+          </tr>
+          <tr>
+            <td>15:30:30.645</td>
+            <td class="rule-id">60109</td>
+            <td class="sev-high">8</td>
+            <td>Jose</td>
+            <td>hacker3</td>
+            <td>User account enabled or created (habilitación)</td>
+          </tr>
+          <tr>
+            <td>15:30:30.662</td>
+            <td class="rule-id">60110</td>
+            <td class="sev-high">8</td>
+            <td>Jose</td>
+            <td>hacker3</td>
+            <td>User account changed</td>
+          </tr>
+          <tr>
+            <td>15:30:30.686</td>
+            <td class="rule-id">60170</td>
+            <td class="sev-medium">5</td>
+            <td>Jose</td>
+            <td>Usuarios</td>
+            <td>Users group changed — agregado a grupo Usuarios</td>
+          </tr>
+          <tr>
+            <td><strong>15:33:25.909</strong></td>
+            <td class="rule-id" style="color:#ffaa00">60154</td>
+            <td style="color:#ff6600">12</td>
+            <td>Jose</td>
+            <td>Administradores</td>
+            <td><strong>⚠ Administrators group changed — escalada de privilegios</strong></td>
+          </tr>
+          <tr>
+            <td>15:33:25.910</td>
+            <td class="rule-id">92031</td>
+            <td class="sev-low">3</td>
+            <td>—</td>
+            <td>—</td>
+            <td>Discovery activity executed (net.exe)</td>
+          </tr>
+          <tr>
+            <td>15:33:54.493</td>
+            <td class="rule-id">92039</td>
+            <td class="sev-low">3</td>
+            <td>—</td>
+            <td>—</td>
+            <td>net.exe account discovery command initiated</td>
+          </tr>
+          <tr>
+            <td>15:33:55.416</td>
+            <td class="rule-id" style="color:#ffaa00">60154</td>
+            <td style="color:#ff6600">12</td>
+            <td>Jose</td>
+            <td>Administradores</td>
+            <td><strong>⚠ Administrators group changed — segundo registro</strong></td>
+          </tr>
+          <tr>
+            <td>15:33:55.418</td>
+            <td class="rule-id">60170</td>
+            <td class="sev-medium">5</td>
+            <td>Jose</td>
+            <td>Usuarios</td>
+            <td>Users group changed</td>
+          </tr>
+          <tr>
+            <td><strong>15:33:56.111</strong></td>
+            <td class="rule-id">60111</td>
+            <td class="sev-high">8</td>
+            <td>Jose</td>
+            <td>hacker3</td>
+            <td><strong>User account disabled or deleted — cuenta eliminada</strong></td>
+          </tr>
+          <tr>
+            <td>15:33:56.111</td>
+            <td class="rule-id">60160</td>
+            <td class="sev-medium">5</td>
+            <td>Jose</td>
+            <td>Ninguno</td>
+            <td>Domain users group changed — limpieza post-eliminación</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Ruido Identificado — Falso Positivo</h2>
+    <div class="warning-box">
+      <strong>Regla 92217 — Executable dropped in Windows root folder (9 eventos)</strong><br/>
+      Generado por <code>C:\Windows\System32\mousocoreworker.exe</code> creando archivos DLL
+      en <code>C:\Windows\SoftwareDistribution\Download\...</code>. Proceso legítimo de
+      Windows Update corriendo como NT AUTHORITY\SYSTEM. Descartado como falso positivo.
+      En producción se suprimiría esta regla para esa ruta específica.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Evidencia Visual</h2>
+    <img src="img/captura-wazuh-w02.png" alt="Dashboard Wazuh mostrando eventos de creación de usuario hacker3" class="evidence-img"/>
+    <div class="img-caption">
+      Fig. 1 — Dashboard Wazuh con eventos filtrados del CASE-W02. Se observan las reglas 60109, 60154, 60111
+      y actividad de discovery via net.exe (92031, 92039).
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <h2>Timeline del Ataque</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-time">15:30:30.578</div>
+        <div class="tl-desc">Cuenta hacker3 creada por jose</div>
+        <div class="tl-detail">Regla 60109 nivel 8 — net user hacker3 /add — cuenta habilitada automáticamente</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">15:30:30.662 — 15:30:30.686</div>
+        <div class="tl-desc">Cuenta hacker3 modificada y agregada a grupo Usuarios</div>
+        <div class="tl-detail">Reglas 60110, 60170 — asignación de grupo base por defecto</div>
+      </div>
+
+      <div class="tl-item alert">
+        <div class="tl-time">15:33:25.909</div>
+        <div class="tl-desc">hacker3 agregado al grupo Administradores — escalada de privilegios</div>
+        <div class="tl-detail">Regla 60154 nivel 12 — net localgroup Administradores hacker3 /add</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-time">15:33:25.910 — 15:33:27.379</div>
+        <div class="tl-desc">Actividad de discovery — reconocimiento post-escalada</div>
+        <div class="tl-detail">Reglas 92031, 92039 — net.exe ejecutado para enumerar cuentas y grupos</div>
+      </div>
+
+      <div class="tl-item noise">
+        <div class="tl-time">15:33:41.700 — 15:33:42.823</div>
+        <div class="tl-desc">Ruido de sistema — Windows Update creando DLLs</div>
+        <div class="tl-detail">Regla 92217 — mousocoreworker.exe — falso positivo descartado</div>
+      </div>
+
+      <div class="tl-item alert">
+        <div class="tl-time">15:33:56.111</div>
+        <div class="tl-desc">Cuenta hacker3 eliminada — intento de borrar rastros</div>
+        <div class="tl-detail">Regla 60111 nivel 8 — net user hacker3 /delete — táctica T1531</div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <h2>MITRE ATT&amp;CK Mapping</h2>
+    <div class="mitre-grid">
+      <div class="mitre-card">
+        <div class="mitre-tactic">Persistence</div>
+        <div class="mitre-id">T1136.001</div>
+        <div class="mitre-name">Create Account: Local Account</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Privilege Escalation</div>
+        <div class="mitre-id">T1098</div>
+        <div class="mitre-name">Account Manipulation — agregado a Admins</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Impact</div>
+        <div class="mitre-id">T1531</div>
+        <div class="mitre-name">Account Access Removal — eliminación de cuenta</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Discovery</div>
+        <div class="mitre-id">T1087.001</div>
+        <div class="mitre-name">Account Discovery: Local Account — net.exe</div>
+      </div>
+      <div class="mitre-card">
+        <div class="mitre-tactic">Defense Evasion</div>
+        <div class="mitre-id">T1070</div>
+        <div class="mitre-name">Indicator Removal — eliminación de cuenta para cubrir rastros</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Indicadores de Compromiso (IOCs)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Contexto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="ioc-tag">Usuario</span></td>
+            <td>hacker3</td>
+            <td>Cuenta local maliciosa creada para persistencia</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Grupo</span></td>
+            <td>Administradores</td>
+            <td>Grupo objetivo para escalada de privilegios</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Proceso</span></td>
+            <td>net.exe</td>
+            <td>LOLBin usado para creación de usuario y discovery</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">SID</span></td>
+            <td>S-1-5-21-...-1006</td>
+            <td>SID asignado a hacker3 en DESKTOP-CC2O1S4</td>
+          </tr>
+          <tr>
+            <td><span class="ioc-tag">Sujeto</span></td>
+            <td>jose / S-1-5-21-...-1001</td>
+            <td>Cuenta comprometida usada para ejecutar las acciones</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <h2>Acciones Tomadas</h2>
+    <div class="alert-box">
+      <strong>Detección:</strong> Wazuh generó alerta nivel 12 (60154) al detectar modificación
+      del grupo Administradores — el nivel más alto registrado en este caso. Alertas nivel 8
+      para creación (60109) y eliminación (60111) de cuenta.
+    </div>
+    <div class="info-box">
+      <strong>Análisis:</strong> Se correlacionaron los eventos de creación, escalada y eliminación
+      por timestamp y sujeto ejecutor (jose). La secuencia crear → escalar → eliminar es un patrón
+      clásico de persistencia encubierta. La eliminación de la cuenta no borra los logs de auditoría,
+      por lo que el rastro permanece en Wazuh.
+    </div>
+    <p><strong>Contención simulada:</strong></p>
+    <div class="code-block">
+# Verificar usuarios locales actuales
+Get-LocalUser
+
+# Verificar miembros del grupo Administradores
+Get-LocalGroupMember -Group "Administradores"
+
+# Eliminar cuenta maliciosa si persiste
+net user hacker3 /delete
+
+# Revisar cuentas creadas recientemente en Event Log
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720} | `
+  Select-Object TimeCreated, Message | Format-List
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lecciones Aprendidas</h2>
+
+    <div class="lesson-item">
+      <span class="lesson-num">01</span>
+      <span>La regla Wazuh 60154 (Administrators group changed) con nivel 12 es una de las alertas de mayor prioridad en un endpoint Windows — cualquier modificación al grupo Administradores debe investigarse inmediatamente.</span>
+    </div>
+    <div class="lesson-item">
+      <span class="lesson-num">02</span>
+      <span>Eliminar una cuenta local no borra los eventos del Security Log. Los registros de creación, escalada y eliminación quedan con el SID original, permitiendo reconstruir la actividad completa.</span>
+    </div>
+    <div class="lesson-item">
+      <span class="lesson-num">03</span>
+      <span>net.exe es un LOLBin — herramienta legítima de Windows usada frecuentemente por atacantes. Wazuh la detectó via Sysmon (92031 y 92039), demostrando la importancia de monitorear ejecución de procesos y no solo Event Log.</span>
+    </div>
+    <div class="lesson-item">
+      <span class="lesson-num">04</span>
+      <span>Durante el análisis se identificó ruido legítimo (92217 — Windows Update) que podría confundir a un analista. Distinguir actividad de sistema de actividad maliciosa es una habilidad crítica en un SOC.</span>
+    </div>
+    <div class="lesson-item">
+      <span class="lesson-num">05</span>
+      <span>La secuencia crear → escalar → eliminar en menos de 4 minutos es un patrón de alta sospecha. En producción, una regla de correlación temporal entre 4720 y 4726 con un 4732 intermedio debería generar una alerta automática de alta prioridad.</span>
+    </div>
+  </div>
+
+  <div class="campaign-nav">
+    <div class="campaign-nav-title">Campaña — Windows Endpoint Attack Simulation</div>
+    <div class="campaign-nav-grid">
+      <a href="case-w01.html" class="nav-case done">W01 — SSH Brute Force ✓</a>
+      <a href="case-w02.html" class="nav-case active">W02 — Creación de Usuarios</a>
+      <a href="case-w03.html" class="nav-case">W03 — Ejecución PowerShell</a>
+      <a href="case-w04.html" class="nav-case">W04 — Elevación de Privilegios</a>
+      <a href="case-w05.html" class="nav-case">W05 — Descarga de Archivos</a>
+      <a href="case-w06.html" class="nav-case">W06 — Persistencia</a>
+      <a href="case-w07.html" class="nav-case">W07 — Escaneo de Puertos</a>
+      <a href="case-w08.html" class="nav-case">W08 — Conexiones RDP</a>
+      <a href="case-w09.html" class="nav-case">W09 — PsExec / WMI</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
