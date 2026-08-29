@@ -69,7 +69,7 @@
             <section id="about">
                 <div class="about-body">
                     <p>
-                        Actualmente curso una <strong>Maestría en Ciberseguridad</strong> y estoy enfocando mi desarrollo hacia <strong>Operaciones SOC</strong>. Me interesa especialmente el trabajo operativo del día a día: mantener visibilidad, responder con orden y asegurar continuidad mediante procesos claros y repetibles.
+                        Actualmente curso una <strong>Maestría en Ciberseguridad</strong> y estoy enfocando mi desarrollo hacia <strong>Operaciones SOC (entry-level)</strong>. Me interesa especialmente el trabajo operativo del día a día: mantener visibilidad, responder con orden y asegurar continuidad mediante procesos claros y repetibles.
                     </p>
                     <p>
                         Mi base en redes y soporte me ha ayudado a desarrollar pensamiento de diagnóstico, atención al detalle y comunicación clara.
@@ -294,6 +294,27 @@
                 <p class="section-intro">Infraestructura y herramientas construidas desde cero en entorno propio. No simuladores — hardware real, problemas reales.</p>
 
                 <div class="up-grid">
+
+                    <div class="up-card card-hover">
+                        <div class="up-card-icon"><i class="fas fa-crosshairs"></i></div>
+                        <div class="up-card-body">
+                            <h3>Triage Range · Consola de Práctica</h3>
+                            <ul>
+                                <li>Herramienta interactiva de filtrado de logs estilo Wazuh Discover, con casos y sistema de dificultad</li>
+                                <li>Panel de campos dinámico, preguntas de verificación y flujo de investigación tipo SOC real</li>
+                                <li>Construida y documentada desde cero como pieza central del portafolio</li>
+                            </ul>
+                            <div class="tags mt">
+                                <span class="tag">DQL / KQL</span>
+                                <span class="tag">Wazuh</span>
+                                <span class="tag">Sentinel</span>
+                                <span class="tag">Log Triage</span>
+                            </div>
+                            <div class="up-links">
+                                <a href="triage-range.html">Ver proyecto <i class="fas fa-arrow-right fa-xs"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="up-card card-hover">
                         <div class="up-card-icon"><i class="fas fa-server"></i></div>
@@ -954,7 +975,7 @@
                         <div class="up-card-body">
                             <h3>Certificaciones objetivo</h3>
                             <ul>
-                                <li><span class="cert-pill">Security Analyst Level 1 (SAL1)</span> — Mediano plazo</li>
+                                <li><span class="cert-pill">Security Analyst Level 1 (SAL1)</span> — Medicano plazo</li>
                                 <li><span class="cert-pill dim-pill">CompTIA Security+</span> — Mediano - Largo Plazo</li>
                             </ul>
                             <!-- <p class="note">Respaldadas en evidencias prácticas: rooms TryHackMe + lab AWS.</p> -->
@@ -1132,129 +1153,5 @@
             glow.style.opacity = '1';
         });
     </script>
-
-
-    
-<!-- Overlay -->
-<div id="pause-banner" style="
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(10, 12, 16, 0.96);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-">
-
-  <div style="
-    max-width: 480px;
-    width: 90%;
-    border: 1px solid rgba(0, 255, 180, 0.25);
-    border-radius: 8px;
-    padding: 2rem 2.5rem;
-    background: rgba(15, 18, 24, 0.95);
-    box-shadow: 0 0 40px rgba(0, 255, 180, 0.06);
-    text-align: center;
-  ">
-
-    <!-- Indicador de estado -->
-    <div style="
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 255, 180, 0.08);
-      border: 1px solid rgba(0, 255, 180, 0.2);
-      border-radius: 20px;
-      padding: 4px 14px;
-      margin-bottom: 1.5rem;
-      font-size: 0.72rem;
-      color: #00ffb4;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    ">
-      <span style="
-        width: 7px; height: 7px;
-        background: #00ffb4;
-        border-radius: 50%;
-        display: inline-block;
-        animation: pulse 1.8s ease-in-out infinite;
-      "></span>
-      Modo estudio activo
-    </div>
-
-    <!-- Título -->
-    <h2 style="
-      margin: 0 0 0.75rem;
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: #e8eaf0;
-      letter-spacing: -0.01em;
-      line-height: 1.3;
-    ">Proyectos en pausa</h2>
-
-    <!-- Mensaje -->
-    <p style="
-      margin: 0 0 1.75rem;
-      font-size: 0.85rem;
-      color: #8891a4;
-      line-height: 1.7;
-    ">
-      Actualmente enfocado en la certificación
-      <span style="color: #c8cfe0; font-weight: 500;">SC-200</span>
-      — Microsoft Security Operations Analyst.<br>
-      El portafolio sigue activo como referencia.
-    </p>
-
-    <!-- Meta info -->
-    <div style="
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 1.75rem;
-      font-size: 0.75rem;
-      color: #555e70;
-    ">
-      
-      <span>📚 SC-200</span>
-    </div>
-
-    <!-- Botón -->
-    <button onclick="document.getElementById('pause-banner').style.display='none'" style="
-      background: transparent;
-      border: 1px solid rgba(136, 145, 164, 0.3);
-      border-radius: 6px;
-      color: #555e70;
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 8px 20px;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: all 0.2s ease;
-    "
-    onmouseover="this.style.borderColor='rgba(0,255,180,0.3)'; this.style.color='#8891a4';"
-    onmouseout="this.style.borderColor='rgba(136,145,164,0.3)'; this.style.color='#555e70';"
-    >
-      Entendido, ver portafolio →
-    </button>
-
-  </div>
-</div>
-
-<!-- Animación del dot -->
-<style>
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
-  }
-</style>
-
-
-
-
-
-    
 </body>
 </html>
